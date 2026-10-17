@@ -1,7 +1,6 @@
 package com.shop.animerch.controller;
 
 import com.shop.animerch.mapper.SellerMapper;
-import com.shop.animerch.model.Seller;
 import com.shop.animerch.record.SellerCreateDTO;
 import com.shop.animerch.record.SellerDTO;
 import com.shop.animerch.service.SellerService;

@@ -1,7 +1,6 @@
 package com.shop.animerch.controller;
 
 import com.shop.animerch.mapper.ProductMapper;
-import com.shop.animerch.model.Product;
 import com.shop.animerch.record.ProductCreateDTO;
 import com.shop.animerch.record.ProductDTO;
 import com.shop.animerch.service.ProductService;
