@@ -1,0 +1,3 @@
+ALTER TABLE product
+ALTER COLUMN description TYPE TEXT
+

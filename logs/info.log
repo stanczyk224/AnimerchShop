@@ -1,0 +1,272 @@
+2026-10-23 13:03:00.762 INFO  [background-preinit] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 9.1.3.Final
+2026-10-23 13:03:00.794 INFO  [main] c.shop.animerch.AnimerchApplication - Starting AnimerchApplication using Java 26.0.2 with PID 24288 (C:\Projects\Animerch\AnimerchShop\target\classes started by d.muydinov in C:\Projects\Animerch\AnimerchShop)
+2026-10-23 13:03:00.795 INFO  [main] c.shop.animerch.AnimerchApplication - No active profile set, falling back to 1 default profile: "default"
+2026-10-23 13:03:01.345 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-23 13:03:01.392 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 40 ms. Found 3 JPA repository interfaces.
+2026-10-23 13:03:01.744 INFO  [main] o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-10-23 13:03:01.754 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-10-23 13:03:01.755 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-10-23 13:03:01.756 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-23 13:03:01.792 INFO  [main] o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 966 ms
+2026-10-23 13:03:02.020 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-10-23 13:03:02.138 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@de579ff
+2026-10-23 13:03:02.139 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-10-23 13:03:02.153 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:postgresql://localhost:5432/animerch (PostgreSQL 18.4)
+2026-10-23 13:03:02.204 INFO  [main] o.f.core.internal.command.DbValidate - Successfully validated 1 migration (execution time 00:00.019s)
+2026-10-23 13:03:02.255 INFO  [main] o.f.core.internal.command.DbMigrate - Current version of schema "public": 1
+2026-10-23 13:03:02.259 INFO  [main] o.f.core.internal.command.DbMigrate - Schema "public" is up to date. No migration necessary.
+2026-10-23 13:03:02.344 INFO  [main] org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-10-23 13:03:02.376 INFO  [main] org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-10-23 13:03:02.640 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-23 13:03:02.693 INFO  [main] o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/animerch]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.4
+	Default catalog/schema: animerch/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-23 13:03:03.310 INFO  [main] org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-23 13:03:03.343 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-23 13:03:03.393 INFO  [main] o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-23 13:03:04.065 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-10-23 13:03:04.078 INFO  [main] o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-10-23 13:03:04.082 INFO  [main] c.shop.animerch.AnimerchApplication - Started AnimerchApplication in 3.732 seconds (process running for 4.077)
+2026-10-23 13:03:18.186 INFO  [http-nio-8080-exec-7] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-23 13:03:18.186 INFO  [http-nio-8080-exec-7] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-10-23 13:03:18.187 INFO  [http-nio-8080-exec-7] o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-10-23 13:08:29.867 INFO  [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-10-23 13:08:29.876 INFO  [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-10-23 13:08:29.879 INFO  [SpringApplicationShutdownHook] o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-23 13:08:29.881 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-10-23 13:08:29.884 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-10-23 13:21:21.031 INFO  [background-preinit] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 9.1.3.Final
+2026-10-23 13:21:21.067 INFO  [main] c.shop.animerch.AnimerchApplication - Starting AnimerchApplication using Java 26.0.2 with PID 27304 (C:\Projects\Animerch\AnimerchShop\target\classes started by d.muydinov in C:\Projects\Animerch\AnimerchShop)
+2026-10-23 13:21:21.068 INFO  [main] c.shop.animerch.AnimerchApplication - No active profile set, falling back to 1 default profile: "default"
+2026-10-23 13:21:21.596 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-23 13:21:21.650 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 46 ms. Found 3 JPA repository interfaces.
+2026-10-23 13:21:22.068 INFO  [main] o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-10-23 13:21:22.077 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-10-23 13:21:22.079 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-10-23 13:21:22.079 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-23 13:21:22.125 INFO  [main] o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 1026 ms
+2026-10-23 13:21:22.342 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-10-23 13:21:22.597 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@2fd39436
+2026-10-23 13:21:22.599 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-10-23 13:21:22.612 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:postgresql://localhost:5432/animerch (PostgreSQL 18.4)
+2026-10-23 13:21:22.664 INFO  [main] o.f.core.internal.command.DbValidate - Successfully validated 1 migration (execution time 00:00.019s)
+2026-10-23 13:21:22.713 INFO  [main] o.f.core.internal.command.DbMigrate - Current version of schema "public": 1
+2026-10-23 13:21:22.715 INFO  [main] o.f.core.internal.command.DbMigrate - Schema "public" is up to date. No migration necessary.
+2026-10-23 13:21:22.796 INFO  [main] org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-10-23 13:21:22.843 INFO  [main] org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-10-23 13:21:23.122 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-23 13:21:23.174 INFO  [main] o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/animerch]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.4
+	Default catalog/schema: animerch/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-23 13:21:23.791 INFO  [main] org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-23 13:21:23.823 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-23 13:21:23.874 INFO  [main] o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-23 13:21:24.516 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-10-23 13:21:24.531 INFO  [main] o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-10-23 13:21:24.536 INFO  [main] c.shop.animerch.AnimerchApplication - Started AnimerchApplication in 3.897 seconds (process running for 4.208)
+2026-10-23 13:21:30.944 INFO  [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-23 13:21:30.944 INFO  [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-10-23 13:21:30.945 INFO  [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-10-23 13:21:31.090 INFO  [http-nio-8080-exec-2] c.s.animerch.service.SellerService - Seller created successfully, id=2
+2026-10-23 13:22:50.864 INFO  [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-10-23 13:22:50.870 INFO  [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-10-23 13:22:50.873 INFO  [SpringApplicationShutdownHook] o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-23 13:22:50.874 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-10-23 13:22:50.876 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-10-23 13:22:55.237 INFO  [background-preinit] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 9.1.3.Final
+2026-10-23 13:22:55.269 INFO  [main] c.shop.animerch.AnimerchApplication - Starting AnimerchApplication using Java 26.0.2 with PID 4456 (C:\Projects\Animerch\AnimerchShop\target\classes started by d.muydinov in C:\Projects\Animerch\AnimerchShop)
+2026-10-23 13:22:55.270 INFO  [main] c.shop.animerch.AnimerchApplication - No active profile set, falling back to 1 default profile: "default"
+2026-10-23 13:22:55.785 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-23 13:22:55.831 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 39 ms. Found 3 JPA repository interfaces.
+2026-10-23 13:22:56.238 INFO  [main] o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-10-23 13:22:56.247 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-10-23 13:22:56.249 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-10-23 13:22:56.249 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-23 13:22:56.289 INFO  [main] o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 987 ms
+2026-10-23 13:22:56.510 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-10-23 13:22:56.630 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@2fd39436
+2026-10-23 13:22:56.631 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-10-23 13:22:56.644 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:postgresql://localhost:5432/animerch (PostgreSQL 18.4)
+2026-10-23 13:22:56.694 INFO  [main] o.f.core.internal.command.DbValidate - Successfully validated 1 migration (execution time 00:00.018s)
+2026-10-23 13:22:56.760 INFO  [main] o.f.core.internal.command.DbMigrate - Current version of schema "public": 1
+2026-10-23 13:22:56.762 INFO  [main] o.f.core.internal.command.DbMigrate - Schema "public" is up to date. No migration necessary.
+2026-10-23 13:22:56.839 INFO  [main] org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-10-23 13:22:56.875 INFO  [main] org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-10-23 13:22:57.129 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-23 13:22:57.193 INFO  [main] o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/animerch]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.4
+	Default catalog/schema: animerch/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-23 13:22:57.828 INFO  [main] org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-23 13:22:57.861 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-23 13:22:57.911 INFO  [main] o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-23 13:22:58.593 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-10-23 13:22:58.606 INFO  [main] o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-10-23 13:22:58.611 INFO  [main] c.shop.animerch.AnimerchApplication - Started AnimerchApplication in 3.769 seconds (process running for 4.115)
+2026-10-23 13:23:46.900 INFO  [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-10-23 13:23:46.906 INFO  [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-10-23 13:23:46.909 INFO  [SpringApplicationShutdownHook] o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-23 13:23:46.910 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-10-23 13:23:46.914 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-10-23 13:24:46.830 INFO  [background-preinit] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 9.1.3.Final
+2026-10-23 13:24:46.864 INFO  [main] c.shop.animerch.AnimerchApplication - Starting AnimerchApplication using Java 26.0.2 with PID 2140 (C:\Projects\Animerch\AnimerchShop\target\classes started by d.muydinov in C:\Projects\Animerch\AnimerchShop)
+2026-10-23 13:24:46.865 INFO  [main] c.shop.animerch.AnimerchApplication - No active profile set, falling back to 1 default profile: "default"
+2026-10-23 13:24:47.376 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-23 13:24:47.429 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 42 ms. Found 3 JPA repository interfaces.
+2026-10-23 13:24:47.813 INFO  [main] o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-10-23 13:24:47.826 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-10-23 13:24:47.828 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-10-23 13:24:47.828 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-23 13:24:47.874 INFO  [main] o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 975 ms
+2026-10-23 13:24:48.140 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-10-23 13:24:48.288 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@10f405ff
+2026-10-23 13:24:48.289 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-10-23 13:24:48.303 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:postgresql://localhost:5432/animerch (PostgreSQL 18.4)
+2026-10-23 13:24:48.355 INFO  [main] o.f.core.internal.command.DbValidate - Successfully validated 1 migration (execution time 00:00.020s)
+2026-10-23 13:24:48.407 INFO  [main] o.f.core.internal.command.DbMigrate - Current version of schema "public": 1
+2026-10-23 13:24:48.410 INFO  [main] o.f.core.internal.command.DbMigrate - Schema "public" is up to date. No migration necessary.
+2026-10-23 13:24:48.482 INFO  [main] org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-10-23 13:24:48.517 INFO  [main] org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-10-23 13:24:48.782 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-23 13:24:48.845 INFO  [main] o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/animerch]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.4
+	Default catalog/schema: animerch/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-23 13:24:49.470 INFO  [main] org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-23 13:24:49.502 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-23 13:24:49.551 INFO  [main] o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-23 13:24:50.193 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-10-23 13:24:50.206 INFO  [main] o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-10-23 13:24:50.211 INFO  [main] c.shop.animerch.AnimerchApplication - Started AnimerchApplication in 3.784 seconds (process running for 4.094)
+2026-10-23 13:25:21.807 INFO  [http-nio-8080-exec-2] o.a.c.c.C.[Tomcat].[localhost].[/] - Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-10-23 13:25:21.807 INFO  [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet - Initializing Servlet 'dispatcherServlet'
+2026-10-23 13:25:21.808 INFO  [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet - Completed initialization in 1 ms
+2026-10-23 13:25:21.949 INFO  [http-nio-8080-exec-2] c.s.animerch.service.SellerService - Seller created successfully, id=3
+2026-10-23 13:25:36.088 INFO  [http-nio-8080-exec-1] c.s.animerch.service.SellerService - Seller deleted successfully, id=3
+2026-10-23 13:45:23.816 INFO  [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-10-23 13:45:23.824 INFO  [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-10-23 13:45:23.827 INFO  [SpringApplicationShutdownHook] o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-23 13:45:23.828 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-10-23 13:45:23.833 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-10-23 14:31:19.222 INFO  [background-preinit] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 9.1.3.Final
+2026-10-23 14:31:19.251 INFO  [main] c.shop.animerch.AnimerchApplication - Starting AnimerchApplication using Java 26.0.2 with PID 23968 (C:\Projects\Animerch\AnimerchShop\target\classes started by d.muydinov in C:\Projects\Animerch\AnimerchShop)
+2026-10-23 14:31:19.252 INFO  [main] c.shop.animerch.AnimerchApplication - No active profile set, falling back to 1 default profile: "default"
+2026-10-23 14:31:19.799 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-23 14:31:19.847 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 40 ms. Found 3 JPA repository interfaces.
+2026-10-23 14:31:20.211 INFO  [main] o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-10-23 14:31:20.220 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-10-23 14:31:20.221 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-10-23 14:31:20.221 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-23 14:31:20.264 INFO  [main] o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 980 ms
+2026-10-23 14:31:20.487 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-10-23 14:31:20.748 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@6cc64028
+2026-10-23 14:31:20.749 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-10-23 14:31:20.762 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:postgresql://localhost:5432/animerch (PostgreSQL 18.4)
+2026-10-23 14:31:20.814 INFO  [main] o.f.core.internal.command.DbValidate - Successfully validated 2 migrations (execution time 00:00.021s)
+2026-10-23 14:31:20.866 INFO  [main] o.f.core.internal.command.DbMigrate - Current version of schema "public": 1
+2026-10-23 14:31:20.874 INFO  [main] o.f.core.internal.command.DbMigrate - Migrating schema "public" to version "2 - alter product description"
+2026-10-23 14:31:20.905 INFO  [main] o.f.core.internal.command.DbMigrate - Successfully applied 1 migration to schema "public", now at version v2 (execution time 00:00.020s)
+2026-10-23 14:31:20.992 INFO  [main] org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-10-23 14:31:21.033 INFO  [main] org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-10-23 14:31:21.299 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-23 14:31:21.363 INFO  [main] o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/animerch]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.4
+	Default catalog/schema: animerch/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-23 14:31:22.035 INFO  [main] org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-23 14:31:22.068 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-23 14:31:22.120 INFO  [main] o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-23 14:31:22.772 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-10-23 14:31:22.786 INFO  [main] o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-10-23 14:31:22.791 INFO  [main] c.shop.animerch.AnimerchApplication - Started AnimerchApplication in 3.992 seconds (process running for 4.306)
+2026-10-23 14:34:36.108 INFO  [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-10-23 14:34:36.114 INFO  [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-10-23 14:34:36.116 INFO  [SpringApplicationShutdownHook] o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-23 14:34:36.118 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-10-23 14:34:36.130 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+2026-10-23 14:34:39.441 INFO  [background-preinit] o.h.validator.internal.util.Version - HV000001: Hibernate Validator 9.1.3.Final
+2026-10-23 14:34:39.473 INFO  [main] c.shop.animerch.AnimerchApplication - Starting AnimerchApplication using Java 26.0.2 with PID 4808 (C:\Projects\Animerch\AnimerchShop\target\classes started by d.muydinov in C:\Projects\Animerch\AnimerchShop)
+2026-10-23 14:34:39.474 INFO  [main] c.shop.animerch.AnimerchApplication - No active profile set, falling back to 1 default profile: "default"
+2026-10-23 14:34:40.043 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-10-23 14:34:40.088 INFO  [main] o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 38 ms. Found 3 JPA repository interfaces.
+2026-10-23 14:34:40.477 INFO  [main] o.s.boot.tomcat.TomcatWebServer - Tomcat initialized with port 8080 (http)
+2026-10-23 14:34:40.485 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Initializing ProtocolHandler ["http-nio-8080"]
+2026-10-23 14:34:40.486 INFO  [main] o.a.catalina.core.StandardService - Starting service [Tomcat]
+2026-10-23 14:34:40.487 INFO  [main] o.a.catalina.core.StandardEngine - Starting Servlet engine: [Apache Tomcat/11.0.24]
+2026-10-23 14:34:40.522 INFO  [main] o.s.b.w.c.s.WebApplicationContextInitializer - Root WebApplicationContext: initialization completed in 1009 ms
+2026-10-23 14:34:40.746 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+2026-10-23 14:34:40.891 INFO  [main] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@44d7e24
+2026-10-23 14:34:40.892 INFO  [main] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+2026-10-23 14:34:40.905 INFO  [main] org.flywaydb.core.FlywayExecutor - Database: jdbc:postgresql://localhost:5432/animerch (PostgreSQL 18.4)
+2026-10-23 14:34:40.968 INFO  [main] o.f.core.internal.command.DbValidate - Successfully validated 3 migrations (execution time 00:00.031s)
+2026-10-23 14:34:41.016 INFO  [main] o.f.core.internal.command.DbMigrate - Current version of schema "public": 2
+2026-10-23 14:34:41.025 INFO  [main] o.f.core.internal.command.DbMigrate - Migrating schema "public" to version "3 - alter seller description"
+2026-10-23 14:34:41.048 INFO  [main] o.f.core.internal.command.DbMigrate - Successfully applied 1 migration to schema "public", now at version v3 (execution time 00:00.013s)
+2026-10-23 14:34:41.125 INFO  [main] org.hibernate.orm.jpa - HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-10-23 14:34:41.159 INFO  [main] org.hibernate.orm.core - HHH000001: Hibernate ORM core version 7.4.5.Final
+2026-10-23 14:34:41.423 INFO  [main] o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-10-23 14:34:41.491 INFO  [main] o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [jdbc:postgresql://localhost:5432/animerch]
+	Database driver: PostgreSQL JDBC Driver
+	Database dialect: PostgreSQLDialect
+	Database version: 18.4
+	Default catalog/schema: animerch/public
+	Autocommit mode: undefined/unknown
+	Isolation level: READ_COMMITTED [default READ_COMMITTED]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-10-23 14:34:42.168 INFO  [main] org.hibernate.orm.core - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-10-23 14:34:42.222 INFO  [main] o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-10-23 14:34:42.272 INFO  [main] o.s.d.j.r.q.QueryEnhancerFactories - Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-10-23 14:34:42.907 INFO  [main] o.a.coyote.http11.Http11NioProtocol - Starting ProtocolHandler ["http-nio-8080"]
+2026-10-23 14:34:42.921 INFO  [main] o.s.boot.tomcat.TomcatWebServer - Tomcat started on port 8080 (http) with context path '/'
+2026-10-23 14:34:42.925 INFO  [main] c.shop.animerch.AnimerchApplication - Started AnimerchApplication in 3.888 seconds (process running for 4.218)
+2026-10-23 14:38:13.919 INFO  [SpringApplicationShutdownHook] o.s.boot.tomcat.GracefulShutdown - Commencing graceful shutdown. Waiting for active requests to complete
+2026-10-23 14:38:13.925 INFO  [tomcat-shutdown] o.s.boot.tomcat.GracefulShutdown - Graceful shutdown complete
+2026-10-23 14:38:13.928 INFO  [SpringApplicationShutdownHook] o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-10-23 14:38:13.930 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+2026-10-23 14:38:13.932 INFO  [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.

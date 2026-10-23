@@ -19,7 +19,7 @@ public class ConsumerController {
 
     @GetMapping
     public List<ConsumerDTO> getAllConsumers() {
-        return this.consumerMapper.toDTOList(consumerService.getConsumer());
+        return this.consumerService.getConsumer();
     }
 
     @GetMapping("{consumerId}")

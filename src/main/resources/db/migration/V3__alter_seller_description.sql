@@ -1,0 +1,3 @@
+ALTER TABLE seller
+ALTER COLUMN description TYPE TEXT
+
