@@ -22,7 +22,7 @@ public class SellerService {
 
     public List<Seller> getSeller() {
         log.debug("Fetching all sellers");
-        List<Seller> sellers = sellerRepository.findAll();
+        List<Seller> sellers = sellerRepository.findAllWithProducts();
 
         log.info("Fetched {} sellers", sellers.size());
         return sellers;
@@ -30,7 +30,7 @@ public class SellerService {
 
     public SellerDTO getSellerById(Long id) {
         log.debug("Fetching seller with id={}", id);
-        Seller seller = sellerRepository.findById(id)
+        Seller seller = sellerRepository.findByIdWithProducts(id)
                 .orElseThrow(() -> {
                     log.warn("Seller with id={} not found", id);
                     return new ResourceNotFoundException(
@@ -54,7 +54,7 @@ public class SellerService {
         Seller savedSeller = sellerRepository.save(seller);
         log.info("Seller created successfully, id={}", savedSeller.getId());
 
-        return sellerMapper.toDTO(seller);
+        return sellerMapper.toDTO(savedSeller);
     }
 
     public void deleteSeller(Long id) {

@@ -7,3 +7,15 @@
 2026-10-23 13:25:35.997 DEBUG [http-nio-8080-exec-1] c.s.animerch.service.SellerService - Deleting seller with id=3
 2026-10-23 14:31:19.252 DEBUG [main] c.shop.animerch.AnimerchApplication - Running with Spring Boot v4.1.1, Spring v7.0.9
 2026-10-23 14:34:39.473 DEBUG [main] c.shop.animerch.AnimerchApplication - Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-10-24 13:23:11.765 DEBUG [main] c.shop.animerch.AnimerchApplication - Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-10-24 13:24:20.568 DEBUG [main] c.shop.animerch.AnimerchApplication - Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-10-24 13:24:51.078 DEBUG [http-nio-8080-exec-1] c.s.animerch.service.SellerService - Fetching all sellers
+2026-10-24 13:24:58.731 DEBUG [http-nio-8080-exec-2] c.s.animerch.service.SellerService - Creating seller
+2026-10-24 13:25:12.645 DEBUG [http-nio-8080-exec-3] c.s.animerch.service.SellerService - Fetching all sellers
+2026-10-24 13:34:58.523 DEBUG [main] c.shop.animerch.AnimerchApplication - Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-10-24 13:35:09.033 DEBUG [http-nio-8080-exec-1] c.s.animerch.service.SellerService - Fetching all sellers
+2026-10-24 13:35:20.043 DEBUG [http-nio-8080-exec-2] c.s.animerch.service.ProductService - Fetching all products
+2026-10-24 13:35:32.393 DEBUG [http-nio-8080-exec-4] c.s.animerch.service.ProductService - Creating product
+2026-10-24 13:35:32.393 DEBUG [http-nio-8080-exec-4] c.s.animerch.service.ProductService - Fetching seller with id=1
+2026-10-24 13:35:32.442 DEBUG [http-nio-8080-exec-4] c.s.animerch.service.ProductService - Product successfully created with id=1
+2026-10-24 13:35:45.036 DEBUG [http-nio-8080-exec-3] c.s.animerch.service.SellerService - Fetching all sellers
