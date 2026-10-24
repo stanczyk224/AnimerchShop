@@ -1,11 +1,14 @@
 package com.shop.animerch.service;
 
+import com.shop.animerch.exception.BadRequestException;
 import com.shop.animerch.exception.ResourceNotFoundException;
 import com.shop.animerch.mapper.ProductMapper;
+import com.shop.animerch.model.Category;
 import com.shop.animerch.model.Product;
 import com.shop.animerch.model.Seller;
 import com.shop.animerch.record.ProductCreateDTO;
 import com.shop.animerch.record.ProductDTO;
+import com.shop.animerch.repository.CategoryRepository;
 import com.shop.animerch.repository.ProductRepository;
 import com.shop.animerch.repository.SellerRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,17 +25,18 @@ public class ProductService {
     private final SellerRepository sellerRepository;
 
     private final ProductMapper productMapper;
+    private final CategoryRepository categoryRepository;
 
     public List<Product> getProduct() {
         log.debug("Fetching all products");
-        List<Product> products = this.productRepository.findAll();
+        List<Product> products = this.productRepository.findAllWithCategories();;
         log.info("Fetched {} products", products.size());
         return  products;
     }
 
     public ProductDTO getProductById(Long id) {
         log.debug("Fetching product with id={}", id);
-        Product product = productRepository.findById(id)
+        Product product = productRepository.findByIdWithCategories(id)
                 .orElseThrow(() -> {
 
                     log.warn("Product with id={} not found", id);
@@ -55,17 +59,34 @@ public class ProductService {
                             "Seller with id " + dto.sellerId() + " not found"
                     );
                 });
+        List<Category> categories = categoryRepository.findAllById(dto.categoryIds());
+        if (categories.size() != dto.categoryIds().size()) {
+            for (Long categoryId : dto.categoryIds()) {
+                boolean exists = categories.stream()
+                        .anyMatch(category -> category.getId().equals(categoryId));
 
+                if (!exists) {
+                    throw new ResourceNotFoundException(
+                            "Category with id " + categoryId + " not found"
+                    );
+                }
+            }
+        }
         Product product = new Product();
+
         product.setName(dto.name());
-        product.setPrice(dto.price());
         product.setDescription(dto.description());
+        product.setModel(dto.model());
+        product.setWeight(dto.weight());
+        product.setQuantity(dto.quantity());
+        product.setPrice(dto.price());
         product.setSeller(seller);
+        product.setCategories(categories);
 
         Product savedProduct = productRepository.save(product);
         log.debug("Product successfully created with id={}", savedProduct.getId());
 
-        return productMapper.toDTO(product);
+        return productMapper.toDTO(savedProduct);
     }
 
     public void deleteProduct(Long id) {

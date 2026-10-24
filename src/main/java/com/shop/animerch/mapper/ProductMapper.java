@@ -9,7 +9,10 @@ import java.util.List;
 
 @Mapper(
         componentModel = "spring",
-        uses = { SellerMapper.class },
+        uses = {
+                SellerMapper.class,
+                CategoryMapper.class
+        },
         unmappedTargetPolicy = ReportingPolicy.IGNORE
 )
 public interface ProductMapper {

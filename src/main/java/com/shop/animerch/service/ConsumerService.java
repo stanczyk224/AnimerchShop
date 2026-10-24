@@ -35,9 +35,12 @@ public class ConsumerService {
         log.debug("Fetching consumer with id={}", id);
 
         Consumer consumer = consumerRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Consumer with id " + id + " not found"
-                ));
+                .orElseThrow(() -> {
+                    log.warn("Category with id={} not found", id);
+                    return new ResourceNotFoundException(
+                            "Consumer with id " + id + " not found"
+                    );
+                });
 
         log.debug("Consumer with id={} found", id);
 

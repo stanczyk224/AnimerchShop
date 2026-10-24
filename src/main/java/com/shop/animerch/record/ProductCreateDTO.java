@@ -3,6 +3,7 @@ package com.shop.animerch.record;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public record ProductCreateDTO(
         @NotBlank(message = "Name is required")
@@ -25,6 +26,8 @@ public record ProductCreateDTO(
 
         @NotNull(message = "Seller ID is required")
         @Positive(message = "Seller ID must be positive")
-        Long sellerId
+        Long sellerId,
+        @NotEmpty(message = "At least one category is required")
+        List<Long> categoryIds
 ) {
 }

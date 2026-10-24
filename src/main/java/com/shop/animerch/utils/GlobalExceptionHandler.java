@@ -2,6 +2,7 @@
 package com.shop.animerch.utils;
 
 import com.shop.animerch.exception.BadRequestException;
+import com.shop.animerch.exception.ConflictException;
 import com.shop.animerch.exception.ErrorResponse;
 import com.shop.animerch.exception.ResourceNotFoundException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -128,6 +129,22 @@ public class GlobalExceptionHandler {
         return buildResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Internal server error",
+                request
+        );
+    }
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(
+            ConflictException ex,
+            HttpServletRequest request
+    ) {
+        log.warn("{} {} - {}",
+                request.getMethod(),
+                request.getRequestURI(),
+                ex.getMessage());
+
+        return buildResponse(
+                HttpStatus.CONFLICT,
+                ex.getMessage(),
                 request
         );
     }
