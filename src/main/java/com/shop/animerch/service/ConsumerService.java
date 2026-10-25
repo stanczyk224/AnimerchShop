@@ -3,10 +3,13 @@ package com.shop.animerch.service;
 
 import com.shop.animerch.exception.ResourceNotFoundException;
 import com.shop.animerch.mapper.ConsumerMapper;
+import com.shop.animerch.model.Cart;
 import com.shop.animerch.model.Consumer;
 import com.shop.animerch.record.ConsumerCreateDTO;
 import com.shop.animerch.record.ConsumerDTO;
+import com.shop.animerch.repository.CartRepository;
 import com.shop.animerch.repository.ConsumerRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,6 +23,7 @@ public class ConsumerService {
 
     private final ConsumerRepository consumerRepository;
     private final ConsumerMapper consumerMapper;
+    private final CartRepository cartRepository;
 
     public List<ConsumerDTO> getConsumer() {
         log.debug("Fetching all consumers");
@@ -46,7 +50,7 @@ public class ConsumerService {
 
         return consumerMapper.toDTO(consumer);
     }
-
+    @Transactional
     public ConsumerDTO addConsumer(ConsumerCreateDTO dto) {
         log.debug("Creating consumer");
 
@@ -59,7 +63,12 @@ public class ConsumerService {
 
         log.info("Consumer created successfully, id={}",
                 savedConsumer.getId());
+        log.debug("Creating cart for consumer id={}", savedConsumer.getId());
+        Cart cart = new Cart();
+        cart.setConsumer(savedConsumer);
 
+        cartRepository.save(cart);
+        log.debug("Cart with id={} created successfully", cart.getId());
         return consumerMapper.toDTO(savedConsumer);
     }
 

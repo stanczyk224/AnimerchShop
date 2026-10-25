@@ -1,12 +1,3 @@
-2026-10-23 13:03:02.679 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-10-23 13:03:03.813 WARN  [main] o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-10-23 13:21:23.159 WARN  [main] org.hibernate.orm.deprecation - HHH90000025: PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
-2026-10-23 13:21:24.281 WARN  [main] o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-10-23 13:22:58.353 WARN  [main] o.s.b.j.a.JpaBaseConfiguration$JpaWebConfiguration - spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
-2026-10-24 13:23:15.569 WARN  [main] o.s.b.w.s.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/hibernate/autoconfigure/HibernateJpaConfiguration.class]: Failed to initialize dependency 'flywayInitializer' of LoadTimeWeaverAware bean 'entityManagerFactory': Error creating bean with name 'flywayInitializer' defined in class path resource [org/springframework/boot/flyway/autoconfigure/FlywayAutoConfiguration$FlywayConfiguration.class]: Unable to obtain connection from database: �����: ������������ "postgres" �� ������ �������� ����������� (�� ������)
---------------------------------------------------------------------------------------------------------------------
-SQL State  : 28P01
-Error Code : 0
-Message    : �����: ������������ "postgres" �� ������ �������� ����������� (�� ������)
-
-2026-10-24 17:42:09.936 WARN  [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=26m41s353ms205µs400ns).
+2026-10-25 16:15:22.016 WARN  [http-nio-8080-exec-2] c.s.a.utils.GlobalExceptionHandler - GET /api/cart/1 - Cart for consumer with id 1 not found
+2026-10-25 16:53:53.439 WARN  [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m29s138ms681µs600ns).
+2026-10-25 17:22:36.008 WARN  [http-nio-8080-exec-1] c.s.a.utils.GlobalExceptionHandler - PUT /api/cart/1/items/2 - Not enough stock for product id=2
