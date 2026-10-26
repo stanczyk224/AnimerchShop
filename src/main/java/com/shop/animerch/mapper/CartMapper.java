@@ -1,4 +1,3 @@
-
 package com.shop.animerch.mapper;
 
 import com.shop.animerch.model.Cart;
@@ -9,7 +8,8 @@ import org.mapstruct.ReportingPolicy;
 
 @Mapper(
         componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        uses = CartItemMapper.class
 )
 public interface CartMapper {
 

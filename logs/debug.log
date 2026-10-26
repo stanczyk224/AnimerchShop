@@ -36,3 +36,36 @@
 2026-10-26 12:36:47.229 DEBUG [main] c.shop.animerch.AnimerchApplication - Running with Spring Boot v4.1.1, Spring v7.0.9
 2026-10-26 12:44:48.987 DEBUG [main] c.shop.animerch.AnimerchApplication - Running with Spring Boot v4.1.1, Spring v7.0.9
 2026-10-26 12:46:00.699 DEBUG [main] c.shop.animerch.AnimerchApplication - Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-10-26 12:52:06.510 DEBUG [main] c.shop.animerch.AnimerchApplication - Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-10-26 12:52:20.626 DEBUG [http-nio-8080-exec-10] c.s.animerch.service.ConsumerService - Fetching all consumers
+2026-10-26 12:52:44.042 DEBUG [http-nio-8080-exec-2] c.s.animerch.service.SellerService - Fetching all sellers
+2026-10-26 12:52:58.675 DEBUG [http-nio-8080-exec-1] c.s.animerch.service.SellerService - Deleting seller with id=4
+2026-10-26 12:53:09.625 DEBUG [http-nio-8080-exec-3] c.s.animerch.service.SellerService - Fetching all sellers
+2026-10-26 12:53:16.579 DEBUG [http-nio-8080-exec-7] c.s.animerch.service.ProductService - Fetching all products
+2026-10-26 12:53:34.338 DEBUG [http-nio-8080-exec-9] c.s.animerch.service.CategoryService - Fetching all categories
+2026-10-26 12:53:56.022 DEBUG [http-nio-8080-exec-10] c.s.animerch.service.CategoryService - Creating category
+2026-10-26 12:54:05.077 DEBUG [http-nio-8080-exec-2] c.s.animerch.service.CategoryService - Fetching all categories
+2026-10-26 12:54:14.014 DEBUG [http-nio-8080-exec-1] c.s.animerch.service.CategoryService - Fetching category with id=1
+2026-10-26 12:54:14.018 DEBUG [http-nio-8080-exec-1] c.s.animerch.service.CategoryService - Category with id=1 found
+2026-10-26 12:55:12.818 DEBUG [http-nio-8080-exec-3] c.s.animerch.service.SellerService - Creating seller
+2026-10-26 12:55:33.846 DEBUG [http-nio-8080-exec-6] c.s.animerch.service.SellerService - Fetching all sellers
+2026-10-26 12:55:42.185 DEBUG [http-nio-8080-exec-8] c.s.animerch.service.ProductService - Fetching all products
+2026-10-26 12:56:32.302 DEBUG [http-nio-8080-exec-5] c.s.animerch.service.ProductService - Creating product
+2026-10-26 12:56:32.303 DEBUG [http-nio-8080-exec-5] c.s.animerch.service.ProductService - Fetching seller with id=5
+2026-10-26 12:56:32.323 DEBUG [http-nio-8080-exec-5] c.s.animerch.service.ProductService - Product successfully created with id=3
+2026-10-26 12:56:56.196 DEBUG [http-nio-8080-exec-4] c.s.animerch.service.SellerService - Fetching all sellers
+2026-10-26 12:57:13.962 DEBUG [http-nio-8080-exec-7] c.s.animerch.service.ConsumerService - Fetching all consumers
+2026-10-26 12:57:28.522 DEBUG [http-nio-8080-exec-9] c.s.animerch.service.ConsumerService - Creating consumer
+2026-10-26 12:57:28.527 DEBUG [http-nio-8080-exec-9] c.s.animerch.service.ConsumerService - Creating cart for consumer id=1
+2026-10-26 12:57:28.531 DEBUG [http-nio-8080-exec-9] c.s.animerch.service.ConsumerService - Cart with id=1 created successfully
+2026-10-26 12:57:38.239 DEBUG [http-nio-8080-exec-10] c.s.animerch.service.ConsumerService - Fetching consumer with id=1
+2026-10-26 12:57:38.243 DEBUG [http-nio-8080-exec-10] c.s.animerch.service.ConsumerService - Consumer with id=1 found
+2026-10-26 12:57:53.759 DEBUG [http-nio-8080-exec-2] c.shop.animerch.service.CartService - Fetching cart for consumer id=1
+2026-10-26 12:58:21.466 DEBUG [http-nio-8080-exec-1] c.s.animerch.service.CartItemService - Adding product id=3 to cart id=1
+2026-10-26 12:58:32.152 DEBUG [http-nio-8080-exec-3] c.s.animerch.service.CartItemService - Editing quantity of the product with id=3 to cart with id=1
+2026-10-26 12:58:40.284 DEBUG [http-nio-8080-exec-6] c.shop.animerch.service.CartService - Fetching cart for consumer id=1
+2026-10-26 13:02:51.644 DEBUG [main] c.shop.animerch.AnimerchApplication - Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-10-26 13:03:06.261 DEBUG [http-nio-8080-exec-10] c.shop.animerch.service.CartService - Fetching cart for consumer id=1
+2026-10-26 16:47:23.447 DEBUG [main] c.s.a.AnimerchApplicationTests - Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-10-26 16:47:58.811 DEBUG [main] c.s.a.AnimerchApplicationTests - Running with Spring Boot v4.1.1, Spring v7.0.9
+2026-10-26 16:48:37.840 DEBUG [main] c.s.a.AnimerchApplicationTests - Running with Spring Boot v4.1.1, Spring v7.0.9
