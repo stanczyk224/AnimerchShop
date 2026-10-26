@@ -1,3 +1,17 @@
 2026-10-25 16:15:22.016 WARN  [http-nio-8080-exec-2] c.s.a.utils.GlobalExceptionHandler - GET /api/cart/1 - Cart for consumer with id 1 not found
 2026-10-25 16:53:53.439 WARN  [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=17m29s138ms681µs600ns).
 2026-10-25 17:22:36.008 WARN  [http-nio-8080-exec-1] c.s.a.utils.GlobalExceptionHandler - PUT /api/cart/1/items/2 - Not enough stock for product id=2
+2026-10-26 12:08:37.996 WARN  [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=58s494ms225µs800ns).
+2026-10-26 12:10:47.416 WARN  [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=2m9s420ms669µs700ns).
+2026-10-26 12:29:53.550 WARN  [HikariPool-1:housekeeper] com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=19m6s133ms429µs600ns).
+2026-10-26 12:33:19.531 WARN  [main] o.s.b.w.s.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'entityManagerFactory' defined in class path resource [org/springframework/boot/hibernate/autoconfigure/HibernateJpaConfiguration.class]: Failed to initialize dependency 'flywayInitializer' of LoadTimeWeaverAware bean 'entityManagerFactory': Error creating bean with name 'flywayInitializer' defined in class path resource [org/springframework/boot/flyway/autoconfigure/FlywayAutoConfiguration$FlywayConfiguration.class]: Unable to obtain connection from database: �����: ������������ "postgres" �� ������ �������� ����������� (�� ������)
+--------------------------------------------------------------------------------------------------------------------
+SQL State  : 28P01
+Error Code : 0
+Message    : �����: ������������ "postgres" �� ������ �������� ����������� (�� ������)
+
+2026-10-26 12:36:53.005 WARN  [main] o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-10-26 12:36:53.006 WARN  [main] o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
+2026-10-26 12:44:52.547 WARN  [main] o.s.b.w.s.s.c.AnnotationConfigServletWebServerApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.context.ApplicationContextException: Failed to start bean 'webServerStartStop'
+2026-10-26 12:46:04.012 WARN  [main] o.s.c.events.SpringDocAppInitializer - SpringDoc /v3/api-docs endpoint is enabled by default. To disable it in production, set the property 'springdoc.api-docs.enabled=false'
+2026-10-26 12:46:04.012 WARN  [main] o.s.c.events.SpringDocAppInitializer - SpringDoc /swagger-ui.html endpoint is enabled by default. To disable it in production, set the property 'springdoc.swagger-ui.enabled=false'
