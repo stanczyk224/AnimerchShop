@@ -14,6 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.ArgumentCaptor;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 import java.util.Optional;
 
@@ -86,6 +87,8 @@ class CartItemServiceTest {
 
         verify(cartItemRepository).save(captor.capture());
         assertEquals(1, captor.getValue().getQuantity());
+        assertSame(cart, captor.getValue().getCart());
+        assertSame(product, captor.getValue().getProduct());
     }
 
 }
