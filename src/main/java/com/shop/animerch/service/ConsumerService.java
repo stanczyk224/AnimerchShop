@@ -40,7 +40,7 @@ public class ConsumerService {
 
         Consumer consumer = consumerRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.warn("Category with id={} not found", id);
+                    log.warn("Consumer with id={} not found", id);
                     return new ResourceNotFoundException(
                             "Consumer with id " + id + " not found"
                     );

@@ -22,7 +22,7 @@ public class Order {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "consumer_id")
+    @JoinColumn(name = "consumer_id", nullable = false)
     private Consumer consumer;
     @Column(name = "created_at", updatable = false, nullable = false)
     private LocalDateTime createdAt;
@@ -34,5 +34,20 @@ public class Order {
     private BigDecimal totalPrice;
     @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
     private List<OrderItem> orderItems = new ArrayList<>();
+
+    public void addItem(OrderItem item) {
+        this.orderItems.add(item);
+        item.setOrder(this);
+    }
+
+    public BigDecimal calculateTotalPrice() {
+        return orderItems.stream()
+                .map(OrderItem::calculateSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public void recalculateTotalPrice() {
+        this.totalPrice = calculateTotalPrice();
+    }
 
 }

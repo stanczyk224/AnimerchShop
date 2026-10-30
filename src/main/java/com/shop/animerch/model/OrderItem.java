@@ -39,5 +39,7 @@ public class OrderItem {
     @DecimalMin(value = "1000.00")
     @Column(nullable = false)
     private BigDecimal unitPrice;
-
+    public BigDecimal calculateSubtotal() {
+        return this.unitPrice.multiply(BigDecimal.valueOf(this.quantity));
+    }
 }
