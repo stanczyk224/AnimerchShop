@@ -21,5 +21,9 @@ public class OrderController {
     public OrderDTO createOrder(@Valid @RequestBody OrderCreateDTO dto) {
         return orderService.createOrder(dto);
     }
-
+    @PostMapping("/checkout")
+    @ResponseStatus(HttpStatus.CREATED)
+    public OrderDTO checkout(@RequestParam Long consumerId) {
+        return orderService.checkout(consumerId);
+    }
 }

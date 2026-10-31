@@ -3,16 +3,11 @@ package com.shop.animerch.service;
 import com.shop.animerch.exception.BadRequestException;
 import com.shop.animerch.exception.ResourceNotFoundException;
 import com.shop.animerch.mapper.OrderMapper;
-import com.shop.animerch.model.Consumer;
-import com.shop.animerch.model.Order;
-import com.shop.animerch.model.OrderItem;
-import com.shop.animerch.model.Product;
+import com.shop.animerch.model.*;
 import com.shop.animerch.record.OrderCreateDTO;
 import com.shop.animerch.record.OrderDTO;
 import com.shop.animerch.record.OrderItemCreateDTO;
-import com.shop.animerch.repository.ConsumerRepository;
-import com.shop.animerch.repository.OrderRepository;
-import com.shop.animerch.repository.ProductRepository;
+import com.shop.animerch.repository.*;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +25,10 @@ public class OrderService {
     private final ConsumerRepository consumerRepository;
     private final ProductRepository productRepository;
     private final OrderMapper orderMapper;
+
+    private final CartRepository cartRepository;
+
+    private final CartItemRepository cartItemRepository;
 
     private Map<Long, Product> validateDuplicateProducts(List<OrderItemCreateDTO> items) {
 
@@ -130,6 +129,54 @@ public class OrderService {
                 consumer.getId(),
                 savedOrder.getTotalPrice(),
                 savedOrder.getOrderItems().size()
+        );
+
+        return orderMapper.toDTO(savedOrder);
+    }
+    @Transactional
+    public OrderDTO checkout(Long consumerId) {
+        log.debug("Starting checkout for consumerId={}", consumerId);
+
+        Cart cart = cartRepository.findByConsumerId(consumerId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Cart for consumer with id " + consumerId + " not found"
+                ));
+
+        if (cart.getCartItems().isEmpty()) {
+            throw new BadRequestException("Cart is empty");
+        }
+
+        Consumer consumer = findConsumerById(consumerId);
+
+        List<OrderItemCreateDTO> items = cart.getCartItems().stream()
+                .map(cartItem -> new OrderItemCreateDTO(
+                        cartItem.getProduct().getId(),
+                        cartItem.getQuantity()
+                ))
+                .toList();
+
+        Map<Long, Product> products = validateDuplicateProducts(items);
+
+        Order order = new Order();
+        order.setConsumer(consumer);
+
+        items.forEach(itemDTO -> {
+            OrderItem orderItem = createOrderItem(itemDTO, products);
+            order.addItem(orderItem);
+        });
+
+        order.recalculateTotalPrice();
+
+        Order savedOrder = orderRepository.save(order);
+
+        cartItemRepository.deleteAll(cart.getCartItems());
+        cart.getCartItems().clear();
+
+        log.info(
+                "Checkout completed: orderId={}, consumerId={}, totalPrice={}",
+                savedOrder.getId(),
+                consumerId,
+                savedOrder.getTotalPrice()
         );
 
         return orderMapper.toDTO(savedOrder);

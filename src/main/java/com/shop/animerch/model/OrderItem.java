@@ -36,7 +36,6 @@ public class OrderItem {
     @Column(nullable = false)
     private int quantity;
 
-    @DecimalMin(value = "1000.00")
     @Column(nullable = false)
     private BigDecimal unitPrice;
     public BigDecimal calculateSubtotal() {
