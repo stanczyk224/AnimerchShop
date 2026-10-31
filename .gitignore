@@ -19,6 +19,10 @@ target/
 **/debug.log
 **/info.log
 /logs/
+/logs/debug.log
+/logs/error.log
+/logs/info.log
+/logs/warn.log
 ### IntelliJ IDEA ###
 .idea
 *.iws

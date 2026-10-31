@@ -1,5 +1,6 @@
 package com.shop.animerch.service;
 
+import com.shop.animerch.exception.BadRequestException;
 import com.shop.animerch.exception.ResourceNotFoundException;
 import com.shop.animerch.mapper.OrderMapper;
 import com.shop.animerch.model.Consumer;
@@ -17,6 +18,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -25,6 +30,45 @@ public class OrderService {
     private final ConsumerRepository consumerRepository;
     private final ProductRepository productRepository;
     private final OrderMapper orderMapper;
+
+    private Map<Long, Product> validateDuplicateProducts(List<OrderItemCreateDTO> items) {
+
+        Map<Long, Integer> productQuantities = new HashMap<>();
+
+        for (OrderItemCreateDTO item : items) {
+            productQuantities.merge(
+                    item.productId(),
+                    item.quantity(),
+                    Integer::sum
+            );
+        }
+
+        Map<Long, Product> products = new HashMap<>();
+
+        for (Long productId : productQuantities.keySet().stream().sorted().toList()) {
+
+            Product product = productRepository.findByIdForUpdate(productId)
+                    .orElseThrow(() ->
+                            new ResourceNotFoundException(
+                                    "Product not found with id " + productId
+                            )
+                    );
+
+            Integer requestedQuantity = productQuantities.get(productId);
+
+            if (requestedQuantity > product.getQuantity()) {
+                throw new BadRequestException(
+                        "Insufficient stock for product with id " + productId
+                                + ". Available: " + product.getQuantity()
+                                + ", requested: " + requestedQuantity
+                );
+            }
+
+            products.put(product.getId(), product);
+        }
+
+        return products;
+    }
 
 
     private Consumer findConsumerById(Long id) {
@@ -41,26 +85,20 @@ public class OrderService {
         log.debug("Consumer with id={} found", id);
         return consumer;
     }
-    private Product findProductById(Long id) {
-        log.debug("Fetching product with id={}", id);
-        Product product = productRepository.findById(id)
-                .orElseThrow(() -> {
+    private OrderItem createOrderItem(
+            OrderItemCreateDTO dto,
+            Map<Long, Product> products
+    ) {
+        Product product = products.get(dto.productId());
 
-                    log.warn("Product with id={} not found", id);
-                    return new ResourceNotFoundException(
-                            "Product with id " + id + " not found"
-                    );
-                });
-        log.debug("Product with id={} found", id);
-        return product;
-    }
-    private OrderItem createOrderItem(OrderItemCreateDTO dto) {
-        Product product = findProductById(dto.productId());
+        product.setQuantity(product.getQuantity() - dto.quantity());
+
         OrderItem item = new OrderItem();
         item.setProduct(product);
         item.setProductName(product.getName());
         item.setQuantity(dto.quantity());
         item.setUnitPrice(product.getPrice());
+
         return item;
     }
 
@@ -70,17 +108,13 @@ public class OrderService {
 
         Consumer consumer = findConsumerById(dto.consumerId());
 
+        Map<Long, Product> products = validateDuplicateProducts(dto.items());
+
         Order order = new Order();
         order.setConsumer(consumer);
 
         dto.items().forEach(itemDTO -> {
-            log.debug(
-                    "Adding product to order: productId={}, quantity={}",
-                    itemDTO.productId(),
-                    itemDTO.quantity()
-            );
-
-            OrderItem item = createOrderItem(itemDTO);
+            OrderItem item = createOrderItem(itemDTO, products);
             order.addItem(item);
         });
 

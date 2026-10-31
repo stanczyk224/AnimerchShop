@@ -2,9 +2,9 @@ package com.shop.animerch.mapper;
 
 import com.shop.animerch.model.Product;
 import com.shop.animerch.record.ProductDTO;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
+import com.shop.animerch.record.ProductUpdateDTO;
+import org.mapstruct.*;
+
 import java.util.List;
 
 @Mapper(
@@ -21,4 +21,11 @@ public interface ProductMapper {
     ProductDTO toDTO(Product product);
 
     List<ProductDTO> toDTOList(List<Product> products);
+    @BeanMapping(
+            nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
+    )
+    void updateProductFromDto(
+            ProductUpdateDTO dto,
+            @MappingTarget Product product
+    );
 }

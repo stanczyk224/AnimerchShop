@@ -3,6 +3,7 @@ package com.shop.animerch.controller;
 import com.shop.animerch.mapper.ProductMapper;
 import com.shop.animerch.record.ProductCreateDTO;
 import com.shop.animerch.record.ProductDTO;
+import com.shop.animerch.record.ProductUpdateDTO;
 import com.shop.animerch.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "api/products")
+@RequestMapping(path = "/api/products")
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
@@ -38,5 +39,13 @@ public class ProductController {
     @DeleteMapping(path = "delete/{productId}")
     public void deleteProduct(@PathVariable("productId") Long id) {
         productService.deleteProduct(id);
+    }
+
+    @PatchMapping(path = "{productId}")
+    public ProductDTO editProductById(
+            @Valid @RequestBody ProductUpdateDTO dto,
+            @PathVariable("productId") Long id
+    ) {
+        return productService.editProduct(dto, id);
     }
 }

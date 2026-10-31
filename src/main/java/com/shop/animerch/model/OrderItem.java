@@ -34,7 +34,7 @@ public class OrderItem {
 
     @Min(1)
     @Column(nullable = false)
-    private Long quantity;
+    private int quantity;
 
     @DecimalMin(value = "1000.00")
     @Column(nullable = false)
