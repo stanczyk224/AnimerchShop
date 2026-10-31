@@ -23,4 +23,7 @@ public class Consumer {
     private String phone;
 
     private String email;
+    @OneToOne
+    @JoinColumn(name = "user_id",nullable = false,unique = true)
+    private User user;
 }
