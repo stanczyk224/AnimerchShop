@@ -1,3 +1,4 @@
+
 package com.shop.animerch.controller;
 
 import com.shop.animerch.record.CartItemDTO;
@@ -8,38 +9,44 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "/api/cart/{cartId}/items")
+@RequestMapping("/api/cart/items")
 @RequiredArgsConstructor
 public class CartItemController {
+
     private final CartItemService cartItemService;
 
     @GetMapping
-    public List<CartItemDTO> getCartItems(
-            @PathVariable Long cartId
-    ) {
-        return cartItemService.getCartItemsByCartId(cartId);
+    public List<CartItemDTO> getCartItems() {
+        return cartItemService.getCartItems();
     }
-    @PostMapping("/{productId}")
-    public CartItemDTO addProductToCart(
-            @PathVariable Long cartId,
+
+    @GetMapping("/{productId}")
+    public CartItemDTO getCartItem(
             @PathVariable Long productId
     ) {
-        return cartItemService.addProductToCart(cartId, productId);
+        return cartItemService.getCartItem(productId);
     }
+
+    @PostMapping("/{productId}")
+    public CartItemDTO addProductToCart(
+            @PathVariable Long productId,
+            @RequestParam(defaultValue = "1") int quantity
+    ) {
+        return cartItemService.addProductToCart(productId, quantity);
+    }
+
     @PutMapping("/{productId}")
     public CartItemDTO editCartItemQuantity(
-            @PathVariable Long cartId,
             @PathVariable Long productId,
             @RequestParam("quantity") int quantity
     ) {
-        return cartItemService.editQuantityCartItem(cartId, productId, quantity);
-    }
-    @DeleteMapping("/{productId}")
-    public void deleteCartItem(
-            @PathVariable Long cartId,
-            @PathVariable Long productId
-    ) {
-        cartItemService.deleteCartItem(cartId, productId);
+        return cartItemService.editQuantityCartItem(productId, quantity);
     }
 
+    @DeleteMapping("/{productId}")
+    public void deleteCartItem(
+            @PathVariable Long productId
+    ) {
+        cartItemService.deleteCartItem(productId);
+    }
 }

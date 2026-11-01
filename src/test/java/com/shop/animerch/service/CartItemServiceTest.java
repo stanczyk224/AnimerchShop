@@ -50,7 +50,7 @@ class CartItemServiceTest {
         // Act + Assert — вызов метода и проверка
         assertThrows(
                 ResourceNotFoundException.class,
-                () -> cartItemService.addProductToCart(cartId, productId)
+                () -> cartItemService.addProductToCart(productId, 1)
         );
         verify(productRepository, never()).findById(productId);
         verify(cartItemRepository, never()).save(
@@ -81,7 +81,7 @@ class CartItemServiceTest {
         );
         when(cartItemRepository.save(any(CartItem.class)))
                 .thenAnswer(invocation -> invocation.getArgument(0));
-        cartItemService.addProductToCart(cartId, productId);
+        cartItemService.addProductToCart(productId, 1);
         ArgumentCaptor<CartItem> captor =
                 ArgumentCaptor.forClass(CartItem.class);
 

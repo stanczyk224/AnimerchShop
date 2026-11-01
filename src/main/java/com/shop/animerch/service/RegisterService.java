@@ -1,10 +1,12 @@
 package com.shop.animerch.service;
 
 import com.shop.animerch.exception.ConflictException;
+import com.shop.animerch.model.Cart;
 import com.shop.animerch.model.Consumer;
 import com.shop.animerch.model.User;
 import com.shop.animerch.record.RegisterRequest;
 import com.shop.animerch.record.RegisterResponse;
+import com.shop.animerch.repository.CartRepository;
 import com.shop.animerch.repository.ConsumerRepository;
 import com.shop.animerch.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class RegisterService {
     private final UserRepository userRepository;
     private final ConsumerRepository consumerRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CartRepository cartRepository;
 
     @Value("${app.admin.email}")
     private String adminEmail;
@@ -53,7 +56,10 @@ public class RegisterService {
                 user
         );
         consumerRepository.save(consumer);
+        Cart cart = new Cart();
+        cart.setConsumer(consumer);
 
+        cartRepository.save(cart);
         return new RegisterResponse(
                 user.getId(),
                 user.getEmail(),

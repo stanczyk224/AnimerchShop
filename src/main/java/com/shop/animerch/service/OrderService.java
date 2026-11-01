@@ -1,17 +1,28 @@
+
 package com.shop.animerch.service;
 
 import com.shop.animerch.exception.BadRequestException;
 import com.shop.animerch.exception.ResourceNotFoundException;
 import com.shop.animerch.mapper.OrderMapper;
-import com.shop.animerch.model.*;
-import com.shop.animerch.record.OrderCreateDTO;
+import com.shop.animerch.model.Cart;
+import com.shop.animerch.model.CartItem;
+import com.shop.animerch.model.Consumer;
+import com.shop.animerch.model.Order;
+import com.shop.animerch.model.OrderItem;
+import com.shop.animerch.model.Product;
 import com.shop.animerch.record.OrderDTO;
-import com.shop.animerch.record.OrderItemCreateDTO;
-import com.shop.animerch.repository.*;
-import org.springframework.transaction.annotation.Transactional;
+import com.shop.animerch.repository.CartItemRepository;
+import com.shop.animerch.repository.CartRepository;
+import com.shop.animerch.repository.ConsumerRepository;
+import com.shop.animerch.repository.OrderRepository;
+import com.shop.animerch.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
@@ -21,23 +32,46 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class OrderService {
+
     private final OrderRepository orderRepository;
     private final ConsumerRepository consumerRepository;
     private final ProductRepository productRepository;
     private final OrderMapper orderMapper;
-
     private final CartRepository cartRepository;
-
     private final CartItemRepository cartItemRepository;
 
-    private Map<Long, Product> validateDuplicateProducts(List<OrderItemCreateDTO> items) {
+    private Consumer getCurrentConsumer() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
 
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("User is not authenticated");
+        }
+
+        String email = authentication.getName();
+
+        return consumerRepository.findByUserEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Consumer with email=%s not found".formatted(email)
+                ));
+    }
+
+    private Map<Long, Product> validateAndLockProducts(List<CartItem> cartItems) {
         Map<Long, Integer> productQuantities = new HashMap<>();
 
-        for (OrderItemCreateDTO item : items) {
+        for (CartItem cartItem : cartItems) {
+            Long productId = cartItem.getProduct().getId();
+            int quantity = cartItem.getQuantity();
+
+            if (quantity < 1) {
+                throw new BadRequestException(
+                        "Invalid quantity for product id=%d".formatted(productId)
+                );
+            }
+
             productQuantities.merge(
-                    item.productId(),
-                    item.quantity(),
+                    productId,
+                    quantity,
                     Integer::sum
             );
         }
@@ -47,84 +81,88 @@ public class OrderService {
         for (Long productId : productQuantities.keySet().stream().sorted().toList()) {
 
             Product product = productRepository.findByIdForUpdate(productId)
-                    .orElseThrow(() ->
-                            new ResourceNotFoundException(
-                                    "Product not found with id " + productId
-                            )
-                    );
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Product with id=%d not found".formatted(productId)
+                    ));
 
-            Integer requestedQuantity = productQuantities.get(productId);
+            int requestedQuantity = productQuantities.get(productId);
 
             if (requestedQuantity > product.getQuantity()) {
                 throw new BadRequestException(
-                        "Insufficient stock for product with id " + productId
-                                + ". Available: " + product.getQuantity()
-                                + ", requested: " + requestedQuantity
+                        "Insufficient stock for product id=%d. Available: %d, requested: %d"
+                                .formatted(
+                                        productId,
+                                        product.getQuantity(),
+                                        requestedQuantity
+                                )
                 );
             }
 
-            products.put(product.getId(), product);
+            products.put(productId, product);
         }
 
         return products;
     }
 
-
-    private Consumer findConsumerById(Long id) {
-        log.debug("Fetching consumer with id={}", id);
-
-        Consumer consumer = consumerRepository.findById(id)
-                .orElseThrow(() -> {
-                    log.warn("Consumer with id={} not found", id);
-                    return new ResourceNotFoundException(
-                            "Consumer with id " + id + " not found"
-                    );
-                });
-
-        log.debug("Consumer with id={} found", id);
-        return consumer;
-    }
     private OrderItem createOrderItem(
-            OrderItemCreateDTO dto,
+            CartItem cartItem,
             Map<Long, Product> products
     ) {
-        Product product = products.get(dto.productId());
+        Long productId = cartItem.getProduct().getId();
 
-        product.setQuantity(product.getQuantity() - dto.quantity());
+        Product product = products.get(productId);
+        int quantity = cartItem.getQuantity();
 
-        OrderItem item = new OrderItem();
-        item.setProduct(product);
-        item.setProductName(product.getName());
-        item.setQuantity(dto.quantity());
-        item.setUnitPrice(product.getPrice());
+        product.setQuantity(product.getQuantity() - quantity);
 
-        return item;
+        OrderItem orderItem = new OrderItem();
+        orderItem.setProduct(product);
+        orderItem.setProductName(product.getName());
+        orderItem.setQuantity(quantity);
+        orderItem.setUnitPrice(product.getPrice());
+
+        return orderItem;
     }
 
     @Transactional
-    public OrderDTO createOrder(OrderCreateDTO dto) {
-        log.debug("Starting order creation for consumerId={}", dto.consumerId());
+    public OrderDTO checkout() {
+        Consumer consumer = getCurrentConsumer();
 
-        Consumer consumer = findConsumerById(dto.consumerId());
+        log.debug(
+                "Starting checkout for consumer id={}",
+                consumer.getId()
+        );
 
-        Map<Long, Product> products = validateDuplicateProducts(dto.items());
+        Cart cart = cartRepository.findByConsumerId(consumer.getId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Cart for consumer id=%d not found".formatted(consumer.getId())
+                ));
+
+        List<CartItem> cartItems = cartItemRepository.findAllByCart(cart);
+
+        if (cartItems.isEmpty()) {
+            throw new BadRequestException("Cart is empty");
+        }
+
+        Map<Long, Product> products = validateAndLockProducts(cartItems);
 
         Order order = new Order();
         order.setConsumer(consumer);
 
-        dto.items().forEach(itemDTO -> {
-            OrderItem item = createOrderItem(itemDTO, products);
-            order.addItem(item);
-        });
+        for (CartItem cartItem : cartItems) {
+            OrderItem orderItem = createOrderItem(cartItem, products);
+            order.addItem(orderItem);
+        }
 
         order.recalculateTotalPrice();
 
-        log.debug("Calculated order total: {}", order.getTotalPrice());
-
         Order savedOrder = orderRepository.save(order);
 
+        cartItemRepository.deleteAll(cartItems);
+        cart.getCartItems().clear();
+
         log.info(
-                "Order created successfully: orderId={}, consumerId={}, totalPrice={}, itemsCount={}",
+                "Checkout completed: orderId={}, consumerId={}, totalPrice={}, itemsCount={}",
                 savedOrder.getId(),
                 consumer.getId(),
                 savedOrder.getTotalPrice(),
@@ -133,54 +171,4 @@ public class OrderService {
 
         return orderMapper.toDTO(savedOrder);
     }
-    @Transactional
-    public OrderDTO checkout(Long consumerId) {
-        log.debug("Starting checkout for consumerId={}", consumerId);
-
-        Cart cart = cartRepository.findByConsumerId(consumerId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Cart for consumer with id " + consumerId + " not found"
-                ));
-
-        if (cart.getCartItems().isEmpty()) {
-            throw new BadRequestException("Cart is empty");
-        }
-
-        Consumer consumer = findConsumerById(consumerId);
-
-        List<OrderItemCreateDTO> items = cart.getCartItems().stream()
-                .map(cartItem -> new OrderItemCreateDTO(
-                        cartItem.getProduct().getId(),
-                        cartItem.getQuantity()
-                ))
-                .toList();
-
-        Map<Long, Product> products = validateDuplicateProducts(items);
-
-        Order order = new Order();
-        order.setConsumer(consumer);
-
-        items.forEach(itemDTO -> {
-            OrderItem orderItem = createOrderItem(itemDTO, products);
-            order.addItem(orderItem);
-        });
-
-        order.recalculateTotalPrice();
-
-        Order savedOrder = orderRepository.save(order);
-
-        cartItemRepository.deleteAll(cart.getCartItems());
-        cart.getCartItems().clear();
-
-        log.info(
-                "Checkout completed: orderId={}, consumerId={}, totalPrice={}",
-                savedOrder.getId(),
-                consumerId,
-                savedOrder.getTotalPrice()
-        );
-
-        return orderMapper.toDTO(savedOrder);
-    }
-
-
 }

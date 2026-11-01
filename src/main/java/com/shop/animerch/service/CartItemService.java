@@ -1,3 +1,4 @@
+
 package com.shop.animerch.service;
 
 import com.shop.animerch.exception.BadRequestException;
@@ -6,14 +7,19 @@ import com.shop.animerch.exception.ResourceNotFoundException;
 import com.shop.animerch.mapper.CartItemMapper;
 import com.shop.animerch.model.Cart;
 import com.shop.animerch.model.CartItem;
+import com.shop.animerch.model.Consumer;
 import com.shop.animerch.model.Product;
 import com.shop.animerch.record.CartItemDTO;
 import com.shop.animerch.repository.CartItemRepository;
 import com.shop.animerch.repository.CartRepository;
+import com.shop.animerch.repository.ConsumerRepository;
 import com.shop.animerch.repository.ProductRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,24 +28,27 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CartItemService {
+
     private final CartItemRepository cartItemRepository;
     private final CartItemMapper cartItemMapper;
-
     private final CartRepository cartRepository;
-
     private final ProductRepository productRepository;
+    private final ConsumerRepository consumerRepository;
 
-    public List<CartItemDTO> getCartItemsByCartId(Long cartId) {
-        log.debug("Fetching cart items");
-        List<CartItem> cartItems = cartItemRepository.findAllByCart_Id(cartId);
-        log.info("fetched {} cart items", cartItems.size());
+    @Transactional
+    public List<CartItemDTO> getCartItems() {
+        Cart cart = getCurrentCart();
+
+        List<CartItem> cartItems = cartItemRepository.findAllByCart(cart);
+
+        log.debug("Fetched {} cart items for current user's cart", cartItems.size());
+
         return cartItemMapper.toDTOList(cartItems);
     }
-    public CartItemDTO getCartItemByCartAndProduct(Long cartId, Long productId) {
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Cart with id=%d not found".formatted(cartId)
-                ));
+
+    @Transactional
+    public CartItemDTO getCartItem(Long productId) {
+        Cart cart = getCurrentCart();
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -48,20 +57,22 @@ public class CartItemService {
 
         CartItem cartItem = cartItemRepository.findByCartAndProduct(cart, product)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Cart item for cart id=%d and product id=%d not found"
-                                .formatted(cartId, productId)
+                        "Product id=%d not found in current user's cart".formatted(productId)
                 ));
+
+        log.debug("Fetched cart item for product id={}", productId);
 
         return cartItemMapper.toDTO(cartItem);
     }
-    @Transactional
-    public CartItemDTO addProductToCart(Long cartId, Long productId) {
-        log.debug("Adding product id={} to cart id={}", productId, cartId);
 
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Cart with id=%d not found".formatted(cartId)
-                ));
+    @Transactional
+    public CartItemDTO addProductToCart(Long productId, int quantity) {
+        log.debug("Adding product id={} to current user's cart", productId);
+        if (quantity < 1) {
+            throw new BadRequestException("Quantity must be at least 1");
+        }
+
+        Cart cart = getCurrentCart();
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -77,7 +88,8 @@ public class CartItemService {
                     return newItem;
                 });
 
-        cartItem.setQuantity(cartItem.getQuantity() + 1);
+        cartItem.setQuantity(cartItem.getQuantity() + quantity);
+
         if (cartItem.getQuantity() > product.getQuantity()) {
             throw new ConflictException(
                     "Not enough stock for product id=%d".formatted(productId)
@@ -94,18 +106,19 @@ public class CartItemService {
 
         return cartItemMapper.toDTO(savedCartItem);
     }
+
     @Transactional
-    public CartItemDTO editQuantityCartItem(Long cartId, Long productId, int quantity){
-        log.debug("Editing quantity of the product with id={} to cart with id={}", productId, cartId);
+    public CartItemDTO editQuantityCartItem(Long productId, int quantity) {
+        log.debug(
+                "Updating quantity of product id={} in current user's cart to {}",
+                productId, quantity
+        );
+
         if (quantity < 1) {
-            throw new BadRequestException(
-                    "Quantity must be at least 1"
-            );
+            throw new BadRequestException("Quantity must be at least 1");
         }
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Cart with id=%d not found".formatted(cartId)
-                ));
+
+        Cart cart = getCurrentCart();
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -114,32 +127,33 @@ public class CartItemService {
 
         CartItem cartItem = cartItemRepository.findByCartAndProduct(cart, product)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Cart item for cart id=%d and product id=%d not found"
-                                .formatted(cartId, productId)
+                        "Product id=%d not found in current user's cart".formatted(productId)
                 ));
-        cartItem.setQuantity(quantity);
-        if (cartItem.getQuantity() > product.getQuantity()) {
+
+        if (quantity > product.getQuantity()) {
             throw new ConflictException(
                     "Not enough stock for product id=%d".formatted(productId)
             );
         }
+
+        cartItem.setQuantity(quantity);
+
         CartItem savedCartItem = cartItemRepository.save(cartItem);
 
         log.info(
-                "Cart item id={} edited with quantity={}",
+                "Cart item id={} updated with quantity={}",
                 savedCartItem.getId(),
                 savedCartItem.getQuantity()
         );
 
         return cartItemMapper.toDTO(savedCartItem);
     }
+
     @Transactional
-    public void deleteCartItem(Long cartId, Long productId) {
-        log.debug("Deleting product id={} from cart id={}", productId, cartId);
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new ResourceNotFoundException(
-                        "Cart with id=%d not found".formatted(cartId)
-                ));
+    public void deleteCartItem(Long productId) {
+        log.debug("Removing product id={} from current user's cart", productId);
+
+        Cart cart = getCurrentCart();
 
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException(
@@ -148,12 +162,32 @@ public class CartItemService {
 
         CartItem cartItem = cartItemRepository.findByCartAndProduct(cart, product)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "Cart item for cart id=%d and product id=%d not found"
-                                .formatted(cartId, productId)
+                        "Product id=%d not found in current user's cart".formatted(productId)
                 ));
 
         cartItemRepository.delete(cartItem);
+
         log.debug("Cart item with id={} successfully deleted", cartItem.getId());
     }
 
+    private Cart getCurrentCart() {
+        Authentication authentication =
+                SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new AccessDeniedException("User is not authenticated");
+        }
+
+        String email = authentication.getName();
+
+        Consumer consumer = consumerRepository.findByUserEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Consumer with email=%s not found".formatted(email)
+                ));
+
+        return cartRepository.findByConsumerId(consumer.getId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Cart for consumer with id=%d not found".formatted(consumer.getId())
+                ));
+    }
 }
