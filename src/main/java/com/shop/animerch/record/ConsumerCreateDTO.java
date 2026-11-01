@@ -10,10 +10,7 @@ public record ConsumerCreateDTO(
         String name,
 
         @NotBlank(message = "Phone is required")
-        @Size(max = 255, message = "Phone must be at most 255 characters")
-        String phone,
+        @Size(max = 30, message = "Phone must be at most 255 characters")
+        String phone
 
-        @Email(message = "Invalid email format")
-        @Size(max = 255, message = "Email must be at most 255 characters")
-        String email
 ) {}

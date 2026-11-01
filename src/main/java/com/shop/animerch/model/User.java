@@ -10,7 +10,32 @@ import java.time.LocalDateTime;
 @Table(name = "app_user")
 @Getter
 @NoArgsConstructor
+
 public class User {
+    public static User createCustomer(String email, String passwordHash) {
+        User user = new User();
+
+        user.email = email;
+        user.passwordHash = passwordHash;
+        user.userRole = UserRole.CUSTOMER;
+        user.enabled = true;
+
+        return user;
+    }
+    public static User createAdmin(String email, String passwordHash) {
+        User user = new User();
+
+        user.email = email;
+        user.passwordHash = passwordHash;
+        user.userRole = UserRole.ADMIN;
+        user.enabled = true;
+
+        return user;
+    }
+    public void promoteToAdmin() {
+        this.userRole = UserRole.ADMIN;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)

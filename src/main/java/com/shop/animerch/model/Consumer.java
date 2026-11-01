@@ -13,6 +13,19 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Consumer {
+    public static Consumer create(
+            String name,
+            String phone,
+            User user
+    ) {
+        Consumer consumer = new Consumer();
+
+        consumer.name = name;
+        consumer.phone = phone;
+        consumer.user = user;
+
+        return consumer;
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
@@ -22,7 +35,6 @@ public class Consumer {
     @Column(nullable = false)
     private String phone;
 
-    private String email;
     @OneToOne
     @JoinColumn(name = "user_id",nullable = false,unique = true)
     private User user;

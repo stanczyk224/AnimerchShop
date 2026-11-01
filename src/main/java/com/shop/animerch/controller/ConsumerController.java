@@ -29,12 +29,6 @@ public class ConsumerController {
         return consumerService.getConsumerById(id);
     }
 
-    @PostMapping(path = "addConsumer")
-    public ConsumerDTO addConsumer(
-            @Valid @RequestBody ConsumerCreateDTO dto
-            ){
-        return consumerService.addConsumer(dto);
-    }
     @DeleteMapping(path = "delete/{consumerId}")
     public void deleteConsumer(@PathVariable("consumerId") Long id) {
         consumerService.deleteConsumer(id);

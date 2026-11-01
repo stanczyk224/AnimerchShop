@@ -56,7 +56,6 @@ public class ConsumerService {
 
         Consumer consumer = new Consumer();
         consumer.setName(dto.name());
-        consumer.setEmail(dto.email());
         consumer.setPhone(dto.phone());
 
         Consumer savedConsumer = consumerRepository.save(consumer);
