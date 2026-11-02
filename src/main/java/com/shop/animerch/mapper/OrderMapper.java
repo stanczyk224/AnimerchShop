@@ -7,6 +7,8 @@ import com.shop.animerch.record.OrderItemDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring")
 public interface OrderMapper {
     @Mapping(target = "consumerId", source = "consumer.id")
@@ -14,4 +16,7 @@ public interface OrderMapper {
     OrderDTO toDTO(Order order);
     @Mapping(target = "productId", source = "product.id")
     OrderItemDTO toDTO(OrderItem orderItem);
+
+    List<OrderDTO> toDTOList(List<Order> orders);
+
 }

@@ -171,4 +171,20 @@ public class OrderService {
 
         return orderMapper.toDTO(savedOrder);
     }
+    @Transactional(readOnly = true)
+    public List<OrderDTO> getMyOrders() {
+        Consumer consumer = getCurrentConsumer();
+
+        List<Order> orders = orderRepository
+                .findAllByConsumerIdOrderByCreatedAtDesc(consumer.getId());
+
+        log.debug(
+                "Fetched {} orders for consumer id={}",
+                orders.size(),
+                consumer.getId()
+        );
+
+        return orderMapper.toDTOList(orders);
+    }
+
 }
