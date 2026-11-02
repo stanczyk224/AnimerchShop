@@ -7,6 +7,7 @@ import com.shop.animerch.record.ProductUpdateDTO;
 import com.shop.animerch.service.ProductService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,17 +32,20 @@ public class ProductController {
     }
 
     @PostMapping(path = "addProduct")
+    @PreAuthorize("hasRole('ADMIN')")
     public ProductDTO addProduct(
             @Valid @RequestBody ProductCreateDTO dto) {
         return productService.addProduct(dto);
     }
 
     @DeleteMapping(path = "delete/{productId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteProduct(@PathVariable("productId") Long id) {
         productService.deleteProduct(id);
     }
 
     @PatchMapping(path = "{productId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ProductDTO editProductById(
             @Valid @RequestBody ProductUpdateDTO dto,
             @PathVariable("productId") Long id

@@ -9,6 +9,7 @@ import com.shop.animerch.record.ConsumerCreateDTO;
 import com.shop.animerch.record.ConsumerDTO;
 import com.shop.animerch.repository.CartRepository;
 import com.shop.animerch.repository.ConsumerRepository;
+import com.shop.animerch.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,6 +25,8 @@ public class ConsumerService {
     private final ConsumerRepository consumerRepository;
     private final ConsumerMapper consumerMapper;
     private final CartRepository cartRepository;
+
+    private final UserRepository userRepository;
 
     public List<ConsumerDTO> getConsumer() {
         log.debug("Fetching all consumers");
@@ -70,17 +73,18 @@ public class ConsumerService {
         log.debug("Cart with id={} created successfully", cart.getId());
         return consumerMapper.toDTO(savedConsumer);
     }
-
+    @Transactional
     public void deleteConsumer(Long id) {
         log.debug("Deleting consumer with id={}", id);
 
-        if (!consumerRepository.existsById(id)) {
-            throw new ResourceNotFoundException(
-                    "Consumer with id " + id + " not found"
-            );
-        }
+        Consumer consumer = consumerRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Consumer with id " + id + " not found"
+                ));
+        Long userId = consumer.getUser().getId();
 
         consumerRepository.deleteById(id);
+        userRepository.deleteById(userId);
 
         log.info("Consumer deleted successfully, id={}", id);
     }

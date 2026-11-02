@@ -7,6 +7,7 @@ import com.shop.animerch.record.CategoryDTO;
 import com.shop.animerch.service.CategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,12 +31,14 @@ public class CategoryController {
         return categoryService.getCategoryById(id);
     }
     @PostMapping(path = "addCategory")
+    @PreAuthorize("hasRole('ADMIN')")
     public CategoryDTO addCategory(
             @Valid @RequestBody CategoryCreateDTO dto
             ){
         return categoryService.addCategory(dto);
     }
     @DeleteMapping(path = "delete/{categoryId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public void deleteCategory(@PathVariable("categoryId") Long id) {
         categoryService.deleteCategory(id);
     }
