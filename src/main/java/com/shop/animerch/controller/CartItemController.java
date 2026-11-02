@@ -3,6 +3,7 @@ package com.shop.animerch.controller;
 
 import com.shop.animerch.record.CartItemDTO;
 import com.shop.animerch.service.CartItemService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,6 +11,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/cart/items")
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class CartItemController {
 

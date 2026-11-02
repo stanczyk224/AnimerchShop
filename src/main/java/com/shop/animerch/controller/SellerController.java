@@ -4,6 +4,7 @@ import com.shop.animerch.mapper.SellerMapper;
 import com.shop.animerch.record.SellerCreateDTO;
 import com.shop.animerch.record.SellerDTO;
 import com.shop.animerch.service.SellerService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +14,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/sellers")
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class SellerController {
     private final SellerService sellerService;

@@ -2,6 +2,7 @@ package com.shop.animerch.controller;
 
 import com.shop.animerch.record.OrderDTO;
 import com.shop.animerch.service.OrderService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/order")
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class OrderController {
 

@@ -5,6 +5,7 @@ import com.shop.animerch.record.ProductCreateDTO;
 import com.shop.animerch.record.ProductDTO;
 import com.shop.animerch.record.ProductUpdateDTO;
 import com.shop.animerch.service.ProductService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/api/products")
+@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 public class ProductController {
     private final ProductService productService;
