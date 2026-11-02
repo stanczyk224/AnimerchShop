@@ -186,5 +186,31 @@ public class OrderService {
 
         return orderMapper.toDTOList(orders);
     }
+    @Transactional(readOnly = true)
+    public List<OrderDTO> getAllOrders() {
+        List<Order> orders = orderRepository.findAllByOrderByCreatedAtDesc();
 
+        log.debug("Fetched {} orders", orders.size());
+
+        return orderMapper.toDTOList(orders);
+    }
+    @Transactional(readOnly = true)
+    public List<OrderDTO> getOrdersByConsumerId(Long consumerId) {
+        if (!consumerRepository.existsById(consumerId)) {
+            throw new ResourceNotFoundException(
+                    "Consumer with id=%d not found".formatted(consumerId)
+            );
+        }
+
+        List<Order> orders = orderRepository
+                .findAllByConsumerIdOrderByCreatedAtDesc(consumerId);
+
+        log.debug(
+                "Fetched {} orders for consumer id={}",
+                orders.size(),
+                consumerId
+        );
+
+        return orderMapper.toDTOList(orders);
+    }
 }
