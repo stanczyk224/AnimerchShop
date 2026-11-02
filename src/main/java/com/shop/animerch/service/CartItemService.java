@@ -190,4 +190,12 @@ public class CartItemService {
                         "Cart for consumer with id=%d not found".formatted(consumer.getId())
                 ));
     }
+    @Transactional
+    public void clearCart() {
+        Cart cart = getCurrentCart();
+
+        cartItemRepository.deleteAllByCart(cart);
+
+        log.info("Cart id={} successfully cleared", cart.getId());
+    }
 }
