@@ -10,16 +10,24 @@ import com.shop.animerch.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
+import com.shop.animerch.utils.CategoryCsvReader;
 import java.util.List;
+import com.shop.animerch.record.ImportResultDTO;
+import com.shop.animerch.record.ImportErrorDTO;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
-
+    private final CategoryCsvReader categoryCsvReader;
     public List<CategoryDTO> getCategory() {
         log.debug("Fetching all categories");
 
@@ -28,6 +36,53 @@ public class CategoryService {
         log.info("Fetched {} categories", categories.size());
 
         return categoryMapper.toDTOList(categories);
+    }
+
+    public ImportResultDTO importCategories(MultipartFile file) throws IOException {
+
+        List<String> names = categoryCsvReader.readCategories(file);
+
+        List<Category> validCategories = new ArrayList<>();
+        List<ImportErrorDTO> errors = new ArrayList<>();
+
+        Set<String> seenNames = new HashSet<>();
+
+        for (int i = 0; i < names.size(); i++) {
+
+            String name = names.get(i);
+            int rowNumber = i + 2;
+
+            if (name == null || name.isBlank()) {
+                errors.add(new ImportErrorDTO(rowNumber, "Name is empty"));
+                continue;
+            }
+
+            String normalizedName = name.trim().toLowerCase(Locale.ROOT);
+
+            if (!seenNames.add(normalizedName)) {
+                errors.add(new ImportErrorDTO(rowNumber, "Duplicate in CSV"));
+                continue;
+            }
+
+            if (categoryRepository.existsByNameIgnoreCase(name.trim())) {
+                errors.add(new ImportErrorDTO(rowNumber, "Category already exists"));
+                continue;
+            }
+
+            Category category = new Category();
+            category.setName(name.trim());
+
+            validCategories.add(category);
+        }
+
+        List<Category> savedCategories = categoryRepository.saveAll(validCategories);
+
+        return new ImportResultDTO(
+                names.size(),
+                savedCategories.size(),
+                errors.size(),
+                errors
+        );
     }
 
     public CategoryDTO getCategoryById(Long id) {
@@ -52,7 +107,7 @@ public class CategoryService {
             );
         }
         Category category = new Category();
-        category.setName(dto.name());
+        category.setName(dtoNameTrimLow);
 
         Category savedCategory = categoryRepository.save(category);
 

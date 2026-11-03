@@ -1,16 +1,19 @@
 package com.shop.animerch.controller;
 
 import com.shop.animerch.mapper.CategoryMapper;
-import com.shop.animerch.model.Category;
 import com.shop.animerch.record.CategoryCreateDTO;
 import com.shop.animerch.record.CategoryDTO;
 import com.shop.animerch.service.CategoryService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com.shop.animerch.record.ImportResultDTO;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -19,8 +22,15 @@ import java.util.List;
 @SecurityRequirement(name = "Bearer Authentication")
 public class CategoryController {
     private final CategoryService categoryService;
-    private final CategoryMapper categoryMapper;
 
+    @PostMapping(
+            value = "/import",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ImportResultDTO importCategories(
+            @RequestParam("file") MultipartFile file
+    ) throws IOException {
+        return categoryService.importCategories(file);
+    }
     @GetMapping
     public List<CategoryDTO> getAllCategories() {
         return this.categoryService.getCategory();
