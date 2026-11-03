@@ -15,8 +15,12 @@ import com.shop.animerch.repository.SellerRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
+import com.shop.animerch.specification.ProductSpecification;
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -71,9 +75,31 @@ public class ProductService {
         return  products;
     }
 
+    public Page<ProductDTO> getProduct(Pageable pageable) {
+        Page<Product> products = productRepository.findAllWithCategories(pageable);
+
+        return products.map(productMapper::toDTO);
+    }
+
     public ProductDTO getProductById(Long id) {
         Product product = findProductById(id);
         return productMapper.toDTO(product);
+    }
+
+    public Page<ProductDTO> searchProducts(
+            String search,
+            Long categoryId,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            Pageable pageable
+    ) {
+        Specification<Product> spec = Specification
+                .where(ProductSpecification.hasName(search))
+                .and(ProductSpecification.hasCategoryId(categoryId))
+                .and(ProductSpecification.hasMinPrice(minPrice))
+                .and(ProductSpecification.hasMaxPrice(maxPrice));
+        Page<Product> products = productRepository.findAll(spec, pageable);
+        return products.map(productMapper::toDTO);
     }
 
     public ProductDTO addProduct(ProductCreateDTO dto) {
