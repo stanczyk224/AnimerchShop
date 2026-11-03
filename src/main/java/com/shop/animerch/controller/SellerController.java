@@ -9,7 +9,11 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import com.shop.animerch.record.ImportResultDTO;
+import org.springframework.http.MediaType;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -19,7 +23,15 @@ import java.util.List;
 public class SellerController {
     private final SellerService sellerService;
     private final SellerMapper sellerMapper;
-
+    @PostMapping(
+            value = "/import",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ImportResultDTO importSellers(
+            @RequestParam("file") MultipartFile file
+    ) throws IOException {
+        return sellerService.importSellers(file);
+    }
     @GetMapping
     public List<SellerDTO> getAllSellers() {
         return this.sellerMapper.toDTOList(sellerService.getSeller());

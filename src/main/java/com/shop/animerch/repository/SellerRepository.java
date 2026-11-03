@@ -17,4 +17,8 @@ public interface SellerRepository extends JpaRepository<Seller, Long> {
     @EntityGraph(attributePaths = "products")
     @Query("SELECT s FROM Seller s WHERE s.id = :id")
     Optional<Seller> findByIdWithProducts(@Param("id") Long id);
+
+    boolean existsByNameIgnoreCase(String name);
+
+    Optional<Seller> findByNameIgnoreCase(String name);
 }

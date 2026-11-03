@@ -15,7 +15,11 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
+import com.shop.animerch.record.ImportResultDTO;
+import org.springframework.http.MediaType;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.List;
 import org.springdoc.core.annotations.ParameterObject;
@@ -42,6 +46,15 @@ public class ProductController {
                 maxPrice,
                 pageable
         );
+    }
+    @PostMapping(
+            value = "/import",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    public ImportResultDTO importProducts(
+            @RequestParam("file") MultipartFile file
+    ) throws IOException {
+        return productService.importProducts(file);
     }
 
     @GetMapping("{productId}")

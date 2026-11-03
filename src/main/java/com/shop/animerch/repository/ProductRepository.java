@@ -50,4 +50,7 @@ public interface ProductRepository
     @Override
     Page<Product> findAll(Specification<Product> spec, Pageable pageable);
 
+    boolean existsByNameIgnoreCase(String name);
+
+
 }
