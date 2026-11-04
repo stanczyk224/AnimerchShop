@@ -36,7 +36,7 @@ public class ProductService {
     private final ProductCsvReader productCsvReader;
     private final ProductMapper productMapper;
     private final CategoryRepository categoryRepository;
-    private static final int MAX_PAGE_SIZE = 100;
+    private static final int MAX_PAGE_SIZE = 20;
     public ImportResultDTO importProducts(MultipartFile file) throws IOException {
 
         List<CSVRecord> records = productCsvReader.readProducts(file);

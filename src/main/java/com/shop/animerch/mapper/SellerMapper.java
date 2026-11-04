@@ -16,7 +16,6 @@ import java.util.List;
 public interface SellerMapper {
     SellerDTO toDTO(Seller seller);
 
-    @Named("toSummaryDTO")
     SellerSummaryDTO toSummaryDTO(Seller seller);
 
     List<SellerDTO> toDTOList(List<Seller> sellers);

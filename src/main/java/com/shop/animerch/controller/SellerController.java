@@ -1,12 +1,15 @@
 package com.shop.animerch.controller;
 
-import com.shop.animerch.mapper.SellerMapper;
 import com.shop.animerch.record.SellerCreateDTO;
 import com.shop.animerch.record.SellerDTO;
+import com.shop.animerch.record.SellerSummaryDTO;
 import com.shop.animerch.service.SellerService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.shop.animerch.record.ImportResultDTO;
@@ -14,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/sellers")
@@ -22,7 +24,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SellerController {
     private final SellerService sellerService;
-    private final SellerMapper sellerMapper;
     @PostMapping(
             value = "/import",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
@@ -33,8 +34,14 @@ public class SellerController {
         return sellerService.importSellers(file);
     }
     @GetMapping
-    public List<SellerDTO> getAllSellers() {
-        return this.sellerMapper.toDTOList(sellerService.getSeller());
+    public Page<SellerSummaryDTO> getAllSellers(
+            @RequestParam(required = false) String search,
+            @ParameterObject Pageable pageable
+    ) {
+        return sellerService.searchSellers(
+                search,
+                pageable
+        );
     }
     @GetMapping("{SellerId}")
     public SellerDTO getSellerById(

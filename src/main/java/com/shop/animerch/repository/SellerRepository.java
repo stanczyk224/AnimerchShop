@@ -1,6 +1,9 @@
 package com.shop.animerch.repository;
 
 import com.shop.animerch.model.Seller;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -21,4 +24,6 @@ public interface SellerRepository extends JpaRepository<Seller, Long> {
     boolean existsByNameIgnoreCase(String name);
 
     Optional<Seller> findByNameIgnoreCase(String name);
+
+    Page<Seller> findAll(Specification<Seller> spec, Pageable pageable);
 }

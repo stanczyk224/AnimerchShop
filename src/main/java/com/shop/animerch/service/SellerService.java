@@ -1,17 +1,19 @@
 package com.shop.animerch.service;
 
+import com.shop.animerch.exception.BadRequestException;
 import com.shop.animerch.exception.ResourceNotFoundException;
 import com.shop.animerch.mapper.SellerMapper;
 import com.shop.animerch.model.Seller;
-import com.shop.animerch.record.SellerCreateDTO;
-import com.shop.animerch.record.SellerDTO;
+import com.shop.animerch.record.*;
 import com.shop.animerch.repository.SellerRepository;
+import com.shop.animerch.specification.SellerSpecification;
 import com.shop.animerch.utils.SellerCsvReader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import com.shop.animerch.record.ImportErrorDTO;
-import com.shop.animerch.record.ImportResultDTO;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,7 +31,7 @@ public class SellerService {
     private final SellerRepository sellerRepository;
     private final SellerCsvReader sellerCsvReader;
     private final SellerMapper sellerMapper;
-
+    private static final int MAX_PAGE_SIZE = 20;
     public ImportResultDTO importSellers(MultipartFile file) throws IOException {
 
         List<CSVRecord> records = sellerCsvReader.readSellers(file);
@@ -95,6 +97,24 @@ public class SellerService {
 
         log.info("Fetched {} sellers", sellers.size());
         return sellers;
+    }
+
+    public Page<SellerSummaryDTO> searchSellers(
+            String search,
+            Pageable pageable
+    ) {
+        if (pageable.getPageSize() > MAX_PAGE_SIZE) {
+            throw new BadRequestException(
+                    "Page size cannot exceed " + MAX_PAGE_SIZE
+            );
+        }
+
+        Specification<Seller> spec =
+                Specification.where(SellerSpecification.hasName(search));
+
+        Page<Seller> sellers = sellerRepository.findAll(spec, pageable);
+
+        return sellers.map(sellerMapper::toSummaryDTO);
     }
 
     public SellerDTO getSellerById(Long id) {
