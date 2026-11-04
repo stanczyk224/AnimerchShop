@@ -28,7 +28,9 @@ target/
 *.iws
 *.iml
 *.ipr
-
+# Uploaded images
+/uploads/
+/uploads/**
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/
