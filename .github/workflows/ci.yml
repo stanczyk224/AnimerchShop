@@ -7,7 +7,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-
+    environment: config
     services:
       postgres:
         image: postgres:17
