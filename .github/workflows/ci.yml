@@ -38,4 +38,8 @@ jobs:
           DB_URL: jdbc:postgresql://localhost:5432/animerch
           DB_USERNAME: postgres
           DB_PASSWORD: postgres
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_EXPIRATION: 3600000
         run: mvn -B verify
