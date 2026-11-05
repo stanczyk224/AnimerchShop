@@ -5,11 +5,15 @@ import com.shop.animerch.exception.ResourceNotFoundException;
 import com.shop.animerch.mapper.ProductMapper;
 import com.shop.animerch.model.Category;
 import com.shop.animerch.model.Product;
+import com.shop.animerch.model.ProductPhoto;
 import com.shop.animerch.model.Seller;
 import com.shop.animerch.record.*;
 import com.shop.animerch.repository.CategoryRepository;
+import com.shop.animerch.repository.ProductPhotoRepository;
 import com.shop.animerch.repository.ProductRepository;
 import com.shop.animerch.repository.SellerRepository;
+import com.shop.animerch.service.storage.StorageService;
+import com.shop.animerch.service.storage.StorageType;
 import com.shop.animerch.utils.ProductCsvReader;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +25,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import com.shop.animerch.specification.ProductSpecification;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.*;
@@ -33,6 +38,8 @@ import java.util.stream.Collectors;
 public class ProductService {
     private final ProductRepository productRepository;
     private final SellerRepository sellerRepository;
+    private final ProductPhotoRepository productPhotoRepository;
+    private final StorageService storageService;
     private final ProductCsvReader productCsvReader;
     private final ProductMapper productMapper;
     private final CategoryRepository categoryRepository;
@@ -326,16 +333,46 @@ public class ProductService {
         return productMapper.toDTO(savedProduct);
     }
 
+    @Transactional
     public void deleteProduct(Long id) {
         log.debug("Deleting product with id={}", id);
-        boolean find = productRepository.existsById(id);
-        if (!find) {
-            log.warn("Cannot delete product with id={}", id);
-            throw new ResourceNotFoundException(
-                    "Product with id " + id + " not found"
-            );
-        }
-        productRepository.deleteById(id);
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Product with id " + id + " not found"
+                ));
+
+
+        List<ProductPhoto> photos = productPhotoRepository.findAllByProductId(id);
+
+
+        List<String> filenames = photos.stream()
+                .map(ProductPhoto::getUrl)
+                .toList();
+
+
+        productPhotoRepository.deleteAll(photos);
+
+
+        productRepository.delete(product);
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        for (String filename : filenames) {
+                            try {
+                                storageService.delete(filename, StorageType.PRODUCTS);
+                            } catch (IOException exception) {
+                                log.error(
+                                        "Failed to delete product photo: {}",
+                                        filename,
+                                        exception
+                                );
+                            }
+                        }
+                    }
+                }
+        );
+
         log.info("Product deleted successfully, id={}", id);
     }
     @Transactional

@@ -3,9 +3,16 @@ package com.shop.animerch.service;
 import com.shop.animerch.exception.BadRequestException;
 import com.shop.animerch.exception.ResourceNotFoundException;
 import com.shop.animerch.mapper.SellerMapper;
+import com.shop.animerch.model.Product;
+import com.shop.animerch.model.ProductPhoto;
 import com.shop.animerch.model.Seller;
+import com.shop.animerch.model.SellerPhoto;
 import com.shop.animerch.record.*;
+import com.shop.animerch.repository.ProductPhotoRepository;
+import com.shop.animerch.repository.SellerPhotoRepository;
 import com.shop.animerch.repository.SellerRepository;
+import com.shop.animerch.service.storage.StorageService;
+import com.shop.animerch.service.storage.StorageType;
 import com.shop.animerch.specification.SellerSpecification;
 import com.shop.animerch.utils.SellerCsvReader;
 import lombok.RequiredArgsConstructor;
@@ -15,8 +22,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.apache.commons.csv.CSVRecord;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -31,6 +40,9 @@ public class SellerService {
     private final SellerRepository sellerRepository;
     private final SellerCsvReader sellerCsvReader;
     private final SellerMapper sellerMapper;
+    private final ProductPhotoRepository productPhotoRepository;
+    private final SellerPhotoRepository sellerPhotoRepository;
+    private final StorageService storageService;
     private static final int MAX_PAGE_SIZE = 20;
     public ImportResultDTO importSellers(MultipartFile file) throws IOException {
 
@@ -145,17 +157,74 @@ public class SellerService {
 
         return sellerMapper.toDTO(savedSeller);
     }
-
+    @Transactional
     public void deleteSeller(Long id) {
         log.debug("Deleting seller with id={}", id);
-        boolean find = sellerRepository.existsById(id);
-        if (!find) {
-            log.warn("Cannot delete seller: id={} not found", id);
-            throw new ResourceNotFoundException(
-                    "Seller with id " + id + " not found"
-            );
+
+        Seller seller = sellerRepository.findByIdWithProducts(id)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Seller with id " + id + " not found"
+                ));
+
+        List<Long> productIds = seller.getProducts().stream()
+                .map(Product::getId)
+                .toList();
+
+        List<ProductPhoto> productPhotos = productIds.isEmpty()
+                ? List.of()
+                : productPhotoRepository.findAllByProductIdIn(productIds);
+        SellerPhoto sellerPhoto = sellerPhotoRepository.findBySellerId(id)
+                .orElse(null);
+
+        List<String> productFilenames = productPhotos.stream()
+                .map(ProductPhoto::getUrl)
+                .toList();
+
+        String sellerFilename = sellerPhoto != null
+                ? sellerPhoto.getUrl()
+                : null;
+
+        productPhotoRepository.deleteAll(productPhotos);
+
+        if (sellerPhoto != null) {
+            sellerPhotoRepository.delete(sellerPhoto);
         }
-        sellerRepository.deleteById(id);
+
+        sellerRepository.delete(seller);
+
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        for (String filename : productFilenames) {
+                            try {
+                                storageService.delete(filename, StorageType.PRODUCTS);
+                            } catch (IOException exception) {
+                                log.error(
+                                        "Failed to delete product photo: {}",
+                                        filename,
+                                        exception
+                                );
+                            }
+                        }
+                        if (sellerFilename != null) {
+                            try {
+                                storageService.delete(
+                                        sellerFilename,
+                                        StorageType.SELLERS
+                                );
+                            } catch (IOException exception) {
+                                log.error(
+                                        "Failed to delete seller photo: {}",
+                                        sellerFilename,
+                                        exception
+                                );
+                            }
+                        }
+                    }
+                }
+        );
+
         log.info("Seller deleted successfully, id={}", id);
     }
 

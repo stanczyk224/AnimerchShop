@@ -7,6 +7,7 @@ import com.shop.animerch.exception.ResourceNotFoundException;
 import com.shop.animerch.record.ProductPhotoDTO;
 import com.shop.animerch.repository.ProductPhotoRepository;
 import com.shop.animerch.repository.ProductRepository;
+import com.shop.animerch.service.storage.ImageValidationService;
 import com.shop.animerch.service.storage.StorageService;
 import com.shop.animerch.service.storage.StorageType;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +20,7 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -31,44 +32,147 @@ public class ProductPhotoService {
     private final ProductPhotoRepository productPhotoRepository;
     private final ProductRepository productRepository;
     private final StorageService storageService;
+    private final ImageValidationService imageValidationService;
+
+    private Product findProductById(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("Product not found"));
+    }
+
+    private long countProductPhotos(Long productId) {
+        return productPhotoRepository.countByProductId(productId);
+    }
+
+    private boolean checkTheLimitOfImporting(MultipartFile[] files) {
+        return files.length <= MAX_PHOTOS;
+    }
+
+    private boolean checkTheLimitOfUploadingProductPhotos(Long productId, MultipartFile[] files) {
+        if(!checkTheLimitOfImporting(files)){
+            return false;
+        }
+        long numberOfUploadingPhotos = files.length;
+        long numberOfProductPhotos = countProductPhotos(productId);
+        return numberOfUploadingPhotos + numberOfProductPhotos <= MAX_PHOTOS;
+    }
+    private boolean checkTheLimitOfUploadingProductPhoto(Long productId) {
+        long numberOfProductPhotos = countProductPhotos(productId);
+        return 1 + numberOfProductPhotos <= MAX_PHOTOS;
+    }
+
+    private void registerFileCleanup(List<String> uploadedFilenames) {
+
+        TransactionSynchronizationManager.registerSynchronization(
+                new TransactionSynchronization() {
+
+                    @Override
+                    public void afterCompletion(int status) {
+
+                        if (status == STATUS_COMMITTED) {
+                            return;
+                        }
+
+                        for (String filename : uploadedFilenames) {
+                            try {
+                                storageService.delete(
+                                        filename,
+                                        StorageType.PRODUCTS
+                                );
+
+                            } catch (IOException exception) {
+                                log.error(
+                                        "Failed to clean up uploaded file: {}",
+                                        filename,
+                                        exception
+                                );
+                            }
+                        }
+                    }
+                }
+        );
+    }
+
+
+    private ProductPhotoDTO saveProductPhoto(Product product, String filename) {
+        ProductPhoto photo = ProductPhoto.builder()
+                .url(filename)
+                .product(product)
+                .build();
+
+        ProductPhoto savedPhoto = productPhotoRepository.saveAndFlush(photo);
+
+        return toDTO(savedPhoto);
+    }
 
     @Transactional(rollbackFor = Exception.class)
     public ProductPhotoDTO uploadPhoto(Long productId, MultipartFile file)
             throws IOException {
 
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("Product not found"));
+        Product product = findProductById(productId);
 
-        if (productPhotoRepository.countByProductId(productId) >= MAX_PHOTOS) {
-            throw new ConflictException("Product cannot have more than 5 photos");
+        if (!checkTheLimitOfUploadingProductPhoto(productId)) {
+            throw new ConflictException(
+                    "Product cannot have more than 5 photos"
+            );
         }
 
-        String filename = storageService.store(file, StorageType.PRODUCTS);
+        imageValidationService.validate(file);
 
-        try {
-            ProductPhoto photo = ProductPhoto.builder()
-                    .url(filename)
-                    .product(product)
-                    .build();
+        List<String> uploadedFilenames = new ArrayList<>();
 
-            ProductPhoto savedPhoto = productPhotoRepository.saveAndFlush(photo);
+        registerFileCleanup(uploadedFilenames);
 
-            return toDTO(savedPhoto);
+        String filename = storageService.store(
+                file, StorageType.PRODUCTS
+        );
+        uploadedFilenames.add(filename);
 
-        } catch (RuntimeException exception) {
-            try {
-                storageService.delete(filename, StorageType.PRODUCTS);
-            } catch (IOException cleanupException) {
-                exception.addSuppressed(cleanupException);
-                log.error("Failed to clean up uploaded file: {}", filename,
-                        cleanupException);
-            }
-
-            throw exception;
-        }
+        return saveProductPhoto(product, filename);
     }
+    @Transactional(rollbackFor = Exception.class)
+    public List<ProductPhotoDTO> importPhotos(
+            Long productId,
+            MultipartFile[] files
+    ) throws IOException {
 
+        Product product = findProductById(productId);
+
+        if (!checkTheLimitOfUploadingProductPhotos(productId, files)) {
+            throw new ConflictException(
+                    "Product cannot have more than 5 photos"
+            );
+        }
+
+        // Сначала валидируем абсолютно все файлы
+        for (MultipartFile file : files) {
+            imageValidationService.validate(file);
+        }
+
+        List<String> uploadedFilenames = new ArrayList<>();
+        List<ProductPhotoDTO> productPhotoDTOS = new ArrayList<>();
+
+        registerFileCleanup(uploadedFilenames);
+
+        for (MultipartFile file : files) {
+
+            String filename = storageService.store(
+                    file,
+                    StorageType.PRODUCTS
+            );
+
+            uploadedFilenames.add(filename);
+
+            ProductPhotoDTO savedDTO = saveProductPhoto(
+                    product,
+                    filename
+            );
+
+            productPhotoDTOS.add(savedDTO);
+        }
+
+        return productPhotoDTOS;
+    }
     @Transactional(readOnly = true)
     public List<ProductPhotoDTO> getPhotos(Long productId) {
 
@@ -81,6 +185,7 @@ public class ProductPhotoService {
                 .map(this::toDTO)
                 .toList();
     }
+
 
     @Transactional
     public void deletePhoto(Long productId, Long photoId) {

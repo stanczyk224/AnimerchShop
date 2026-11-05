@@ -3,14 +3,21 @@ package com.shop.animerch.controller;
 import com.shop.animerch.record.ProductPhotoDTO;
 import com.shop.animerch.service.ProductPhotoService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -24,6 +31,7 @@ import org.springframework.http.MediaTypeFactory;
 @PreAuthorize("hasRole('ADMIN')")
 @SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Product Photos", description = "Product photo management")
 public class ProductPhotoController {
 
@@ -61,6 +69,34 @@ public class ProductPhotoController {
                 .status(HttpStatus.CREATED)
                 .body(photo);
     }
+
+    @PostMapping(
+            path = "/import",
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
+    @Operation(summary = "Bulk import for a product")
+    public ResponseEntity<List<ProductPhotoDTO>> importPhotos(
+            @PathVariable Long productId,
+            @Parameter(
+                    description = "Product images",
+                    content = @Content(
+                            mediaType = MediaType.MULTIPART_FORM_DATA_VALUE,
+                            array = @ArraySchema(
+                                    schema = @Schema(type = "string", format = "binary")
+                            )
+                    )
+            )
+            @RequestPart("files") MultipartFile[] files
+    ) throws IOException {
+
+        List<ProductPhotoDTO> photos =
+                productPhotoService.importPhotos(productId, files);
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(photos);
+    }
+
 
     @GetMapping
     @Operation(summary = "Get all photos of a product")

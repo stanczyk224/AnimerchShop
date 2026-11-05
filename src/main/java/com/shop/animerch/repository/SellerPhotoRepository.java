@@ -13,4 +13,6 @@ public interface SellerPhotoRepository extends JpaRepository<SellerPhoto, Long> 
     Optional<SellerPhoto> findByIdAndSellerId(Long id, Long sellerId);
 
     long countBySellerId(Long sellerId);
+
+    Optional<SellerPhoto> findBySellerId(Long sellerId);
 }

@@ -14,4 +14,6 @@ public interface ProductPhotoRepository
     long countByProductId(Long productId);
 
     Optional<ProductPhoto> findByIdAndProductId(Long id, Long productId);
+
+    List<ProductPhoto> findAllByProductIdIn(List<Long> productIds);
 }

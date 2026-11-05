@@ -124,6 +124,8 @@ public class ImageValidationService {
             return "image/webp";
         }
 
+
+
         throw new IOException("Unsupported image format");
     }
     public String getImageExtension(MultipartFile file) throws IOException {
