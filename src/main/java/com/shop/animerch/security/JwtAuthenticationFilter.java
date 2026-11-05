@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.authentication.AccountStatusUserDetailsChecker;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import io.jsonwebtoken.JwtException;
@@ -39,9 +41,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String email = jwtService.extractEmail(token);
+            if (email == null || email.isBlank()) {
+                throw new UsernameNotFoundException("Token subject is missing");
+            }
 
             UserDetails userDetails =
                     userDetailsService.loadUserByUsername(email);
+            new AccountStatusUserDetailsChecker().check(userDetails);
 
             UsernamePasswordAuthenticationToken authentication =
                     new UsernamePasswordAuthenticationToken(
@@ -53,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             SecurityContextHolder.getContext()
                     .setAuthentication(authentication);
 
-        } catch (JwtException | UsernameNotFoundException e) {
+        } catch (JwtException | AuthenticationException | IllegalArgumentException e) {
             SecurityContextHolder.clearContext();
         }
 

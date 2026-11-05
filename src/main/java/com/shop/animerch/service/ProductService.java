@@ -135,10 +135,10 @@ public class ProductService {
                 continue;
             }
 
-            if (price.compareTo(BigDecimal.ZERO) < 0) {
+            if (price.compareTo(BigDecimal.ZERO) <= 0) {
                 errors.add(new ImportErrorDTO(
                         rowNumber,
-                        "Price cannot be negative"
+                        "Price must be greater than zero"
                 ));
                 continue;
             }

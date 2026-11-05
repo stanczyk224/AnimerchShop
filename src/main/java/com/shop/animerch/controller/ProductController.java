@@ -45,6 +45,7 @@ public class ProductController {
             value = "/import",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
+    @PreAuthorize("hasRole('ADMIN')")
     public ImportResultDTO importProducts(
             @RequestParam("file") MultipartFile file
     ) throws IOException {

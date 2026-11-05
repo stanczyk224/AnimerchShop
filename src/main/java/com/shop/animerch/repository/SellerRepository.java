@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SellerRepository extends JpaRepository<Seller, Long> {
-    @EntityGraph(attributePaths = "products")
+    @EntityGraph(attributePaths = {"products", "photo"})
     @Query("SELECT s FROM Seller s")
     List<Seller> findAllWithProducts();
 
-    @EntityGraph(attributePaths = "products")
+    @EntityGraph(attributePaths = {"products", "photo"})
     @Query("SELECT s FROM Seller s WHERE s.id = :id")
     Optional<Seller> findByIdWithProducts(@Param("id") Long id);
 
@@ -25,5 +25,6 @@ public interface SellerRepository extends JpaRepository<Seller, Long> {
 
     Optional<Seller> findByNameIgnoreCase(String name);
 
+    @EntityGraph(attributePaths = "photo")
     Page<Seller> findAll(Specification<Seller> spec, Pageable pageable);
 }

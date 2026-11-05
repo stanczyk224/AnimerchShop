@@ -22,7 +22,7 @@ public class Cart {
     private Long id;
 
     @OneToOne
-    @JoinColumn(name = "consumer_id")
+    @JoinColumn(name = "consumer_id", nullable = false, unique = true)
     private Consumer consumer;
 
     @OneToMany(mappedBy = "cart")

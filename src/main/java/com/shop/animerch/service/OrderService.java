@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import jakarta.persistence.EntityManager;
 
 @Slf4j
 @Service
@@ -39,6 +40,7 @@ public class OrderService {
     private final OrderMapper orderMapper;
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
+    private final EntityManager entityManager;
 
     private Consumer getCurrentConsumer() {
         Authentication authentication =
@@ -87,6 +89,10 @@ public class OrderService {
 
             int requestedQuantity = productQuantities.get(productId);
 
+            // Cart loading may already have put this product into the persistence context.
+            // Read the stock again after obtaining the lock, rather than using that snapshot.
+            entityManager.refresh(product);
+
             if (requestedQuantity > product.getQuantity()) {
                 throw new BadRequestException(
                         "Insufficient stock for product id=%d. Available: %d, requested: %d"
@@ -133,7 +139,7 @@ public class OrderService {
                 consumer.getId()
         );
 
-        Cart cart = cartRepository.findByConsumerId(consumer.getId())
+        Cart cart = cartRepository.findByConsumerIdForUpdate(consumer.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Cart for consumer id=%d not found".formatted(consumer.getId())
                 ));

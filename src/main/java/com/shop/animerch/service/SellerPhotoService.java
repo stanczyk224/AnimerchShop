@@ -26,7 +26,7 @@ import java.util.List;
 @Slf4j
 public class SellerPhotoService {
 
-    private static final int MAX_PHOTOS = 5;
+    private static final int MAX_PHOTOS = 1;
 
     private final SellerPhotoRepository sellerPhotoRepository;
     private final SellerRepository sellerRepository;
@@ -42,7 +42,7 @@ public class SellerPhotoService {
 
         if (sellerPhotoRepository.countBySellerId(sellerId) >= MAX_PHOTOS) {
             throw new ConflictException(
-                    "Seller cannot have more than 5 photos"
+                    "Seller already has a photo; delete it before uploading another"
             );
         }
 

@@ -88,13 +88,13 @@ public class CartItemService {
                     return newItem;
                 });
 
-        cartItem.setQuantity(cartItem.getQuantity() + quantity);
-
-        if (cartItem.getQuantity() > product.getQuantity()) {
+        if ((long) cartItem.getQuantity() + quantity > product.getQuantity()) {
             throw new ConflictException(
                     "Not enough stock for product id=%d".formatted(productId)
             );
         }
+
+        cartItem.setQuantity(cartItem.getQuantity() + quantity);
 
         CartItem savedCartItem = cartItemRepository.save(cartItem);
 
@@ -185,7 +185,7 @@ public class CartItemService {
                         "Consumer with email=%s not found".formatted(email)
                 ));
 
-        return cartRepository.findByConsumerId(consumer.getId())
+        return cartRepository.findByConsumerIdForUpdate(consumer.getId())
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Cart for consumer with id=%d not found".formatted(consumer.getId())
                 ));

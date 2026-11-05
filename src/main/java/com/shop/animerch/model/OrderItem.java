@@ -33,7 +33,7 @@ public class OrderItem {
     private String productName;
 
     @Min(1)
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "bigint")
     private int quantity;
 
     @Column(nullable = false)

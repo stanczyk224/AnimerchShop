@@ -3,6 +3,7 @@ package com.shop.animerch.record;
 import com.shop.animerch.model.Product;
 
 import java.util.List;
+import java.math.BigDecimal;
 
 /**
  * DTO for {@link Product}
@@ -14,7 +15,7 @@ public record ProductDTO(
         String model,
         String weight,
         int quantity,
-        double price,
+        BigDecimal price,
         SellerSummaryDTO seller,
         List<CategoryDTO> categories,
         List<ProductPhotoDTO> photos

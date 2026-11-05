@@ -36,6 +36,7 @@ import java.util.Set;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class SellerService {
     private final SellerRepository sellerRepository;
     private final SellerCsvReader sellerCsvReader;
@@ -44,6 +45,7 @@ public class SellerService {
     private final SellerPhotoRepository sellerPhotoRepository;
     private final StorageService storageService;
     private static final int MAX_PAGE_SIZE = 20;
+    @Transactional(rollbackFor = IOException.class)
     public ImportResultDTO importSellers(MultipartFile file) throws IOException {
 
         List<CSVRecord> records = sellerCsvReader.readSellers(file);
@@ -143,6 +145,7 @@ public class SellerService {
         return sellerMapper.toDTO(seller);
     }
 
+    @Transactional
     public SellerDTO addSeller(SellerCreateDTO dto) {
         log.debug("Creating seller");
         Seller seller = new Seller();
