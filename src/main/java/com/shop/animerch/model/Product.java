@@ -39,5 +39,6 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private List<Category> categories = new ArrayList<>();
-
+    @OneToMany(mappedBy = "product")
+    private List<ProductPhoto> photos = new ArrayList<>();
 }

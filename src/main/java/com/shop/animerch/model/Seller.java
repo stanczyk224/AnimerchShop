@@ -28,5 +28,6 @@ public class Seller {
     private String address;
     @OneToMany(mappedBy = "seller", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Product> products = new ArrayList<>();
-
+    @OneToOne(mappedBy = "seller", fetch = FetchType.LAZY)
+    private SellerPhoto photo;
 }

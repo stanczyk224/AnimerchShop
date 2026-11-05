@@ -16,5 +16,6 @@ public record ProductDTO(
         int quantity,
         double price,
         SellerSummaryDTO seller,
-        List<CategoryDTO> categories
+        List<CategoryDTO> categories,
+        List<ProductPhotoDTO> photos
 ) {}

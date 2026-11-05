@@ -8,5 +8,6 @@ import java.util.List;
 public record SellerDTO(
         Long id,
         String name,
-        List<ProductSummaryDTO> products) {
+        List<ProductSummaryDTO> products,
+        SellerPhotoDTO photo) {
 }

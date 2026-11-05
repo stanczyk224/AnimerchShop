@@ -19,7 +19,7 @@ public class SellerPhoto {
     @Column(nullable = false)
     private String url;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seller_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id", nullable = false, unique = true)
     private Seller seller;
 }

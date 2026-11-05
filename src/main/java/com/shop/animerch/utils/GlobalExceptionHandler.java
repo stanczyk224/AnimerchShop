@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.security.authentication.BadCredentialsException;
-
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 
@@ -179,6 +179,21 @@ public class GlobalExceptionHandler {
         return buildResponse(
                 HttpStatus.UNAUTHORIZED,
                 "Invalid email or password",
+                request
+        );
+    }
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxUploadSize(
+            MaxUploadSizeExceededException ex,
+            HttpServletRequest request
+    ) {
+        log.warn("File size exceeded: method={}, path={}",
+                request.getMethod(),
+                request.getRequestURI());
+
+        return buildResponse(
+                HttpStatus.CONTENT_TOO_LARGE,
+                "Uploaded file exceeds the maximum allowed size",
                 request
         );
     }
