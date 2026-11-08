@@ -40,7 +40,7 @@ The project follows a layered architecture and uses Docker Compose for simplifie
 - Seller photo uploads.
 
 ### Product Reviews
-- Customers can review products present in their order history after checkout.
+- Customers can review products with at least one delivered order item in their own order history.
 - One review per customer per product, with a rating from 1 to 5 and required text (up to 5000 characters).
 - Authenticated users can read paginated product reviews.
 
@@ -55,8 +55,9 @@ Create a review with `POST /api/products/{productId}/reviews` and a bearer token
 
 Returns `201 Created`; customers who have not ordered the product receive `403 Forbidden`,
 duplicate reviews return `409 Conflict`, and invalid input returns `400 Bad Request`.
-The customer identity comes from the token. Order history currently has no payment or delivery status,
-so an existing checkout qualifies for a review.
+The customer identity comes from the token. Only `DELIVERED` order items qualify for creating
+a review; `PLACED`, `SHIPPED`, and `CANCELLED` items do not. Existing reviews remain editable
+and deletable by their authors.
 
 Read reviews with `GET /api/products/{productId}/reviews?page=0&size=20` and a bearer token.
 Results default to newest first and include the customer's display name, rating, comment, and creation time.

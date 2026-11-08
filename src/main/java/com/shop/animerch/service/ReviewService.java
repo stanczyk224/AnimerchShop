@@ -5,6 +5,7 @@ import com.shop.animerch.exception.ResourceNotFoundException;
 import com.shop.animerch.model.Consumer;
 import com.shop.animerch.model.Product;
 import com.shop.animerch.model.Review;
+import com.shop.animerch.model.OrderStatus;
 import com.shop.animerch.record.ReviewCreateDTO;
 import com.shop.animerch.record.ReviewDTO;
 import com.shop.animerch.repository.*;
@@ -25,15 +26,16 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ConsumerRepository consumerRepository;
     private final ProductRepository productRepository;
-    private final OrderRepository orderRepository;
+    private final OrderItemRepository orderItemRepository;
 
     @Transactional
     public ReviewDTO create(Long productId, ReviewCreateDTO dto) {
         Consumer consumer = getCurrentConsumerForUpdate();
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
-        if (!orderRepository.existsByConsumerIdAndOrderItemsProductId(consumer.getId(), productId)) {
-            throw new AccessDeniedException("You can only review products you have ordered");
+        if (!orderItemRepository.existsByOrderConsumerIdAndProductIdAndStatus(
+                consumer.getId(), productId, OrderStatus.DELIVERED)) {
+            throw new AccessDeniedException("You can only review products delivered to you");
         }
         if (reviewRepository.existsByConsumerIdAndProductId(consumer.getId(), productId)) {
             throw new ConflictException("You have already reviewed this product");

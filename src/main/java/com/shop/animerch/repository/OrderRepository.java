@@ -10,7 +10,6 @@ import java.util.Optional;
 
 @Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    boolean existsByConsumerIdAndOrderItemsProductId(Long consumerId, Long productId);
     List<Order> findAllByConsumerIdOrderByCreatedAtDesc(Long consumerId);
 
     Optional<Order> findByIdAndConsumerId(Long orderId, Long consumerId);

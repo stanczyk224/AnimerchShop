@@ -5,6 +5,9 @@ import com.shop.animerch.exception.ResourceNotFoundException;
 import com.shop.animerch.model.Consumer;
 import com.shop.animerch.model.Product;
 import com.shop.animerch.model.Review;
+import com.shop.animerch.model.OrderStatus;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
 import com.shop.animerch.record.ReviewCreateDTO;
 import com.shop.animerch.repository.*;
 import org.junit.jupiter.api.AfterEach;
@@ -33,7 +36,7 @@ class ReviewServiceTest {
     @Mock ReviewRepository reviews;
     @Mock ConsumerRepository consumers;
     @Mock ProductRepository products;
-    @Mock OrderRepository orders;
+    @Mock OrderItemRepository orders;
     @InjectMocks ReviewService service;
 
     private Consumer consumer;
@@ -62,9 +65,9 @@ class ReviewServiceTest {
     }
 
     @Test
-    void purchaserCanCreateReviewUsingAuthenticatedIdentity() {
+    void deliveredPurchaserCanCreateReviewUsingAuthenticatedIdentity() {
         customerAndProductExist();
-        when(orders.existsByConsumerIdAndOrderItemsProductId(7L, 12L)).thenReturn(true);
+        when(orders.existsByOrderConsumerIdAndProductIdAndStatus(7L, 12L, OrderStatus.DELIVERED)).thenReturn(true);
         when(reviews.save(any(Review.class))).thenAnswer(invocation -> {
             Review review = invocation.getArgument(0);
             assertSame(consumer, review.getConsumer());
@@ -89,10 +92,42 @@ class ReviewServiceTest {
         verify(reviews, never()).save(any());
     }
 
+    @ParameterizedTest
+    @EnumSource(value = OrderStatus.class, names = {"PLACED", "SHIPPED", "CANCELLED"})
+    void undeliveredOrderItemDoesNotQualify(OrderStatus existingStatus) {
+        customerAndProductExist();
+        when(orders.existsByOrderConsumerIdAndProductIdAndStatus(anyLong(), anyLong(), any()))
+                .thenAnswer(invocation -> invocation.getArgument(2) == existingStatus);
+
+        var error = assertThrows(AccessDeniedException.class, () -> service.create(12L, request));
+
+        assertEquals("You can only review products delivered to you", error.getMessage());
+        verify(orders).existsByOrderConsumerIdAndProductIdAndStatus(7L, 12L, OrderStatus.DELIVERED);
+        verifyNoInteractions(reviews);
+    }
+
+    @Test
+    void deliveryToAnotherCustomerDoesNotQualify() {
+        customerAndProductExist();
+        when(orders.existsByOrderConsumerIdAndProductIdAndStatus(anyLong(), anyLong(), any()))
+                .thenAnswer(invocation -> Long.valueOf(99L).equals(invocation.getArgument(0)));
+        assertThrows(AccessDeniedException.class, () -> service.create(12L, request));
+        verifyNoInteractions(reviews);
+    }
+
+    @Test
+    void deliveryOfAnotherProductDoesNotQualify() {
+        customerAndProductExist();
+        when(orders.existsByOrderConsumerIdAndProductIdAndStatus(anyLong(), anyLong(), any()))
+                .thenAnswer(invocation -> Long.valueOf(99L).equals(invocation.getArgument(1)));
+        assertThrows(AccessDeniedException.class, () -> service.create(12L, request));
+        verifyNoInteractions(reviews);
+    }
+
     @Test
     void repeatPurchaseDoesNotAllowDuplicateReview() {
         customerAndProductExist();
-        when(orders.existsByConsumerIdAndOrderItemsProductId(7L, 12L)).thenReturn(true);
+        when(orders.existsByOrderConsumerIdAndProductIdAndStatus(7L, 12L, OrderStatus.DELIVERED)).thenReturn(true);
         when(reviews.existsByConsumerIdAndProductId(7L, 12L)).thenReturn(true);
         assertThrows(ConflictException.class, () -> service.create(12L, request));
         verify(reviews, never()).save(any());
@@ -163,6 +198,7 @@ class ReviewServiceTest {
         assertNotNull(result.editedAt());
         assertTrue(result.edited());
         assertEquals(result.editedAt(), review.getEditedAt());
+        verifyNoInteractions(orders);
     }
 
     @Test
@@ -188,6 +224,7 @@ class ReviewServiceTest {
         Review review = existingReview();
         service.delete(12L, 1L);
         verify(reviews).delete(review);
+        verifyNoInteractions(orders);
     }
 
     @Test
