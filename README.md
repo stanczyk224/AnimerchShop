@@ -39,6 +39,40 @@ The project follows a layered architecture and uses Docker Compose for simplifie
 - Seller information management.
 - Seller photo uploads.
 
+### Product Reviews
+- Customers can review products present in their order history after checkout.
+- One review per customer per product, with a rating from 1 to 5 and required text (up to 5000 characters).
+- Authenticated users can read paginated product reviews.
+
+Create a review with `POST /api/products/{productId}/reviews` and a bearer token:
+
+```json
+{
+  "rating": 5,
+  "comment": "Great quality!"
+}
+```
+
+Returns `201 Created`; customers who have not ordered the product receive `403 Forbidden`,
+duplicate reviews return `409 Conflict`, and invalid input returns `400 Bad Request`.
+The customer identity comes from the token. Order history currently has no payment or delivery status,
+so an existing checkout qualifies for a review.
+
+Read reviews with `GET /api/products/{productId}/reviews?page=0&size=20` and a bearer token.
+Results default to newest first and include the customer's display name, rating, comment, and creation time.
+Flyway migration `V16__create_review.sql` creates the review table on startup.
+
+Authors can edit their review with `PUT /api/products/{productId}/reviews/{reviewId}`
+using the same rating and comment JSON body, or delete it with `DELETE` at that URL
+(`204 No Content`). Both require a bearer token; modifying someone else's review returns `403`.
+An unknown review or mismatched product returns `404`.
+
+Review responses include `edited` and `editedAt`. New reviews have `edited: false`
+and `editedAt: null`. Changing the rating or trimmed comment sets `edited: true` and
+records the latest edit time while preserving `createdAt`. Submitting unchanged content
+preserves the previous edit status and date. Migration `V17__add_review_edited_at.sql`
+adds the timestamp to existing reviews.
+
 ### Consumer Management
 - Consumer CRUD operations.
 - Automatic shopping cart creation.
