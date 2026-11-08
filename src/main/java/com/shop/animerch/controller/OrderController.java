@@ -1,8 +1,11 @@
 package com.shop.animerch.controller;
 
 import com.shop.animerch.record.OrderDTO;
+import com.shop.animerch.record.OrderItemDTO;
+import com.shop.animerch.record.OrderItemStatusUpdateDTO;
 import com.shop.animerch.service.OrderService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -38,5 +41,14 @@ public class OrderController {
             @PathVariable Long consumerId
     ) {
         return orderService.getOrdersByConsumerId(consumerId);
+    }
+    @PatchMapping("/{orderId}/items/{itemId}/status")
+    @PreAuthorize("hasRole('ADMIN')")
+    public OrderItemDTO patchOrderItem(
+            @PathVariable Long itemId,
+            @PathVariable Long orderId,
+            @Valid @RequestBody OrderItemStatusUpdateDTO nextStatus
+            ) {
+        return orderService.updateStatusOfOrderItem(itemId,orderId,nextStatus);
     }
 }

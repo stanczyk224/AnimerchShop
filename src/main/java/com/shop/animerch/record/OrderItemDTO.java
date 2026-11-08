@@ -1,5 +1,7 @@
 package com.shop.animerch.record;
 
+import com.shop.animerch.model.OrderStatus;
+
 import java.math.BigDecimal;
 
 public record OrderItemDTO(
@@ -7,7 +9,7 @@ public record OrderItemDTO(
         Long productId,
         String productName,
         Long quantity,
-        BigDecimal unitPrice
-
+        BigDecimal unitPrice,
+        OrderStatus status
 ) {
 }

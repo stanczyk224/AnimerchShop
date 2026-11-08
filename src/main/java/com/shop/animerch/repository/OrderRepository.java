@@ -1,6 +1,7 @@
 package com.shop.animerch.repository;
 
 import com.shop.animerch.model.Order;
+import com.shop.animerch.model.OrderItem;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -14,4 +15,5 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     Optional<Order> findByIdAndConsumerId(Long orderId, Long consumerId);
     List<Order> findAllByOrderByCreatedAtDesc();
+
 }

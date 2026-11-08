@@ -41,4 +41,8 @@ public class OrderItem {
     public BigDecimal calculateSubtotal() {
         return this.unitPrice.multiply(BigDecimal.valueOf(this.quantity));
     }
+
+    @Column(nullable = false,length = 20)
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status = OrderStatus.PLACED;
 }

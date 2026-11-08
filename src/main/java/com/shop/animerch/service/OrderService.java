@@ -4,18 +4,11 @@ package com.shop.animerch.service;
 import com.shop.animerch.exception.BadRequestException;
 import com.shop.animerch.exception.ResourceNotFoundException;
 import com.shop.animerch.mapper.OrderMapper;
-import com.shop.animerch.model.Cart;
-import com.shop.animerch.model.CartItem;
-import com.shop.animerch.model.Consumer;
-import com.shop.animerch.model.Order;
-import com.shop.animerch.model.OrderItem;
-import com.shop.animerch.model.Product;
+import com.shop.animerch.model.*;
 import com.shop.animerch.record.OrderDTO;
-import com.shop.animerch.repository.CartItemRepository;
-import com.shop.animerch.repository.CartRepository;
-import com.shop.animerch.repository.ConsumerRepository;
-import com.shop.animerch.repository.OrderRepository;
-import com.shop.animerch.repository.ProductRepository;
+import com.shop.animerch.record.OrderItemDTO;
+import com.shop.animerch.record.OrderItemStatusUpdateDTO;
+import com.shop.animerch.repository.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
@@ -41,6 +34,8 @@ public class OrderService {
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
     private final EntityManager entityManager;
+
+    private final OrderItemRepository orderItemRepository;
 
     private Consumer getCurrentConsumer() {
         Authentication authentication =
@@ -218,5 +213,55 @@ public class OrderService {
         );
 
         return orderMapper.toDTOList(orders);
+    }
+
+    @Transactional
+    public OrderItemDTO updateStatusOfOrderItem(Long orderItemId, Long orderId, OrderItemStatusUpdateDTO dto){
+        OrderStatus nextStatus = dto.status();
+        OrderItem orderItem = orderItemRepository.findByIdAndOrderIdForUpdate(orderItemId, orderId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Item with orderId=%d and orderItemId=%d".formatted(orderId,orderItemId)
+                ));
+        boolean allowed = isAllowed(orderItem, nextStatus);
+        if(!allowed) {
+            throw new BadRequestException(
+                    "invalid transition %s for status %s".formatted(nextStatus, orderItem.getStatus())
+            );
+        }
+        if(nextStatus==OrderStatus.CANCELLED){
+            Long productId = orderItem.getProduct().getId();
+            Product product = productRepository.findByIdForUpdate(productId)
+                            .orElseThrow(() -> new ResourceNotFoundException(
+                                    "Product with id=%d not found".formatted(productId)
+                            ));
+            entityManager.refresh(product);
+            product.setQuantity(product.getQuantity() + orderItem.getQuantity()); // Changes the quantity of the product
+        }
+        orderItem.setStatus(nextStatus);
+        return orderMapper.toDTO(orderItem);
+
+
+    }
+
+    private static boolean isAllowed(OrderItem orderItem, OrderStatus nextStatus) {
+        OrderStatus itemStatus = orderItem.getStatus();
+        /*
+        ________________________________________
+        | Current status | Allowed next status |
+        |----------------|---------------------|
+        | PLACED         | SHIPPED, CANCELLED  |
+        | SHIPPED        | DELIVERED           |
+        | DELIVERED      | None                |
+        | CANCELLED      | None                |
+        ---------------------------------------
+         */
+        return switch (itemStatus) {
+            case PLACED ->
+                    nextStatus == OrderStatus.SHIPPED
+                            || nextStatus == OrderStatus.CANCELLED;
+            case SHIPPED ->
+                    nextStatus == OrderStatus.DELIVERED;
+            case DELIVERED, CANCELLED -> false;
+        };
     }
 }
