@@ -2,6 +2,8 @@
 package com.shop.animerch.service;
 
 import com.shop.animerch.exception.BadRequestException;
+import com.shop.animerch.exception.ConflictException;
+import com.shop.animerch.record.CheckoutRequest;
 import com.shop.animerch.exception.ResourceNotFoundException;
 import com.shop.animerch.mapper.OrderMapper;
 import com.shop.animerch.model.*;
@@ -16,6 +18,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 
 import java.util.HashMap;
 import java.util.List;
@@ -126,8 +134,15 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderDTO checkout() {
+    public OrderDTO checkout(String idempotencyKey, CheckoutRequest request) {
+        if (idempotencyKey == null || !idempotencyKey.matches("[A-Za-z0-9._:-]{1,128}")) {
+            throw new BadRequestException("Idempotency-Key must contain 1 to 128 letters, digits, dots, underscores, colons or hyphens");
+        }
         Consumer consumer = getCurrentConsumer();
+
+        var address = request.deliveryAddress();
+        DeliveryAddress snapshot = new DeliveryAddress(address.recipientName(), address.phone(),
+                address.addressLine1(), address.addressLine2(), address.city(), address.postalCode(), address.country());
 
         log.debug(
                 "Starting checkout for consumer id={}",
@@ -139,6 +154,17 @@ public class OrderService {
                         "Cart for consumer id=%d not found".formatted(consumer.getId())
                 ));
 
+        // Serialize checkout for this customer before checking the key. A waiting
+        // retry must see the order committed by the first request before reading the cart.
+        var existing = orderRepository.findByConsumerIdAndCheckoutKey(consumer.getId(), idempotencyKey);
+        if (existing.isPresent()) {
+            if (!snapshot.equals(existing.get().getDeliveryAddress())) {
+                throw new ConflictException(
+                        "Idempotency-Key was already used with different delivery details");
+            }
+            return orderMapper.toDTO(existing.get());
+        }
+
         List<CartItem> cartItems = cartItemRepository.findAllByCart(cart);
 
         if (cartItems.isEmpty()) {
@@ -149,6 +175,8 @@ public class OrderService {
 
         Order order = new Order();
         order.setConsumer(consumer);
+        order.setCheckoutKey(idempotencyKey);
+        order.setDeliveryAddress(snapshot);
 
         for (CartItem cartItem : cartItems) {
             OrderItem orderItem = createOrderItem(cartItem, products);
@@ -172,47 +200,63 @@ public class OrderService {
 
         return orderMapper.toDTO(savedOrder);
     }
-    @Transactional(readOnly = true)
-    public List<OrderDTO> getMyOrders() {
-        Consumer consumer = getCurrentConsumer();
-
-        List<Order> orders = orderRepository
-                .findAllByConsumerIdOrderByCreatedAtDesc(consumer.getId());
-
-        log.debug(
-                "Fetched {} orders for consumer id={}",
-                orders.size(),
-                consumer.getId()
-        );
-
-        return orderMapper.toDTOList(orders);
-    }
-    @Transactional(readOnly = true)
-    public List<OrderDTO> getAllOrders() {
-        List<Order> orders = orderRepository.findAllByOrderByCreatedAtDesc();
-
-        log.debug("Fetched {} orders", orders.size());
-
-        return orderMapper.toDTOList(orders);
-    }
-    @Transactional(readOnly = true)
-    public List<OrderDTO> getOrdersByConsumerId(Long consumerId) {
-        if (!consumerRepository.existsById(consumerId)) {
-            throw new ResourceNotFoundException(
-                    "Consumer with id=%d not found".formatted(consumerId)
-            );
+    private Pageable orderPage(int page, int size) {
+        if (page < 0 || size < 1 || size > 100) {
+            throw new BadRequestException("Page must be non-negative and size must be between 1 and 100");
         }
+        return PageRequest.of(page, size,
+                Sort.by(
+                        Sort.Order.desc("createdAt"),
+                        Sort.Order.desc("id")));
+    }
 
-        List<Order> orders = orderRepository
-                .findAllByConsumerIdOrderByCreatedAtDesc(consumerId);
+    @Transactional(readOnly = true)
+    public Page<OrderDTO> getMyOrders(int page, int size) {
+        var pageable = orderPage(page, size);
+        Consumer consumer = getCurrentConsumer();
+        return orderRepository.findAllByConsumerId(consumer.getId(), pageable).map(orderMapper::toDTO);
+    }
 
-        log.debug(
-                "Fetched {} orders for consumer id={}",
-                orders.size(),
-                consumerId
-        );
+    @Transactional(readOnly = true)
+    public Page<OrderDTO> getAllOrders(int page, int size) {
+        return orderRepository.findAll(orderPage(page, size)).map(orderMapper::toDTO);
+    }
 
-        return orderMapper.toDTOList(orders);
+    @Transactional(readOnly = true)
+    public Page<OrderDTO> getOrdersByConsumerId(Long consumerId, int page, int size) {
+        var pageable = orderPage(page, size);
+        if (!consumerRepository.existsById(consumerId)) {
+            throw new ResourceNotFoundException("Consumer with id=%d not found".formatted(consumerId));
+        }
+        return orderRepository.findAllByConsumerId(consumerId, pageable).map(orderMapper::toDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public OrderDTO getOrderById(Long orderId) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()
+                || authentication instanceof AnonymousAuthenticationToken) {
+            throw new AccessDeniedException("User is not authenticated");
+        }
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order with id=%d not found".formatted(orderId)));
+        boolean admin = authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+        if (!admin && !order.getConsumer().getId().equals(getCurrentConsumer().getId())) {
+            throw new AccessDeniedException("You can only view your own orders");
+        }
+        return orderMapper.toDTO(order);
+    }
+
+    @Transactional
+    public OrderItemDTO cancelMyOrderItem(Long orderItemId, Long orderId) {
+        Consumer consumer = getCurrentConsumer();
+        OrderItem item = orderItemRepository.findByIdAndOrderIdForUpdate(orderItemId, orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order item not found"));
+        if (!item.getOrder().getConsumer().getId().equals(consumer.getId())) {
+            throw new AccessDeniedException("You can only cancel your own order items");
+        }
+        return changeStatus(item, OrderStatus.CANCELLED);
     }
 
     @Transactional
@@ -222,6 +266,10 @@ public class OrderService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "Item with orderId=%d and orderItemId=%d".formatted(orderId,orderItemId)
                 ));
+        return changeStatus(orderItem, nextStatus);
+    }
+
+    private OrderItemDTO changeStatus(OrderItem orderItem, OrderStatus nextStatus) {
         boolean allowed = isAllowed(orderItem, nextStatus);
         if(!allowed) {
             throw new BadRequestException(

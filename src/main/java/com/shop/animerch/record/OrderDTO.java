@@ -7,6 +7,10 @@ public record OrderDTO(
         Long id,
         Long consumerId,
         BigDecimal totalPrice,
+        BigDecimal originalTotal,
+        BigDecimal cancelledTotal,
+        BigDecimal activeTotal,
+        DeliveryAddressDTO deliveryAddress,
         List<OrderItemDTO> items
         ) {
 }

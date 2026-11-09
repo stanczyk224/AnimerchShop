@@ -3,11 +3,24 @@ name: CI
 on:
   push:
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    environment: config
+    timeout-minutes: 20
+    env:
+      DB_URL: jdbc:postgresql://localhost:5432/animerch
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres
+      ADMIN_EMAIL: ci-admin@example.test
+      ADMIN_PASSWORD: ci-only-admin-password-123
+      # Base64-encoded test-only signing key; never used outside this disposable job.
+      JWT_SECRET: Y2ktb25seS1qd3Qtc2lnbmluZy1rZXktbm90LWZvci1wcm9kdWN0aW9u
+      JWT_EXPIRATION: '3600000'
     services:
       postgres:
         image: postgres:17
@@ -33,13 +46,20 @@ jobs:
           distribution: temurin
           cache: maven
 
-      - name: Run tests
-        env:
-          DB_URL: jdbc:postgresql://localhost:5432/animerch
-          DB_USERNAME: postgres
-          DB_PASSWORD: postgres
-          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
-          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          JWT_EXPIRATION: 3600000
-        run: mvn -B verify
+      - name: Build and run all tests
+        run: bash ./mvnw -B -ntp verify
+
+      - name: Summarize tests and verify database coverage
+        if: always()
+        run: python3 .github/scripts/check_test_reports.py
+
+      - name: Preserve test reports and application logs
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: test-reports
+          path: |
+            target/surefire-reports/
+            logs/
+          retention-days: 14
+          if-no-files-found: warn

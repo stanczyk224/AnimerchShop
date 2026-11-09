@@ -78,6 +78,102 @@ adds the timestamp to existing reviews.
 - Consumer CRUD operations.
 - Automatic shopping cart creation.
 
+### Retrying checkout
+
+`POST /api/order/checkout` requires a bearer token and an `Idempotency-Key` header.
+It also requires a JSON body containing the delivery snapshot:
+
+```json
+{
+  "deliveryAddress": {
+    "recipientName": "Recipient Name",
+    "phone": "+998901234567",
+    "addressLine1": "12 Main Street",
+    "addressLine2": "Apartment 4",
+    "city": "Tashkent",
+    "postalCode": "100000",
+    "country": "Uzbekistan"
+  }
+}
+```
+
+Every field except `addressLine2` is required and must not be blank. Maximum lengths
+are 255 for recipient name and each address line, 30 for phone, 100 for city and
+country, and 20 for postal code. Invalid bodies return `400`. The address is saved
+on the order and returned as `deliveryAddress` in checkout, order details, and order
+history. Later customer profile changes do not change this snapshot. Migration V20
+keeps `deliveryAddress: null` for existing orders whose historical address is unknown.
+
+Use a fresh UUID for each new purchase and reuse that UUID when retrying the same
+purchase after a timeout:
+
+```http
+POST /api/order/checkout
+Authorization: Bearer <token>
+Idempotency-Key: 6cf0de21-65fa-4a1a-b588-d878853a1112
+```
+
+Keys are case-sensitive, 1–128 characters, using letters, digits, `.`, `_`, `:`, or
+`-`. Missing or invalid keys return `400`. Keys are scoped to the authenticated
+customer, so different customers can use the same key independently. Successful
+requests and retries return `201` with the same order ID. Retries return that
+order's current details, including any later status changes, without consuming
+the current cart or deducting stock again. Use a new key for a new purchase.
+Failed checkout transactions do not reserve the key; the same key can be retried
+after correcting the problem. Keys remain associated with their orders, including
+cancelled orders. Migration V19 adds the nullable key for legacy orders and enforces
+uniqueness per customer. Clients must now supply this header for checkout.
+
+Retries must send the same delivery field values (JSON property order does not
+matter). A reused key with different delivery details returns `409 Conflict` without
+changing the saved order, cart, or stock. Null and omitted address line 2 are
+equivalent; other values are compared exactly, including whitespace and case.
+An order created before delivery snapshots cannot be retried with a new address;
+retrieve it through the order details endpoint instead.
+
+### Order details and history
+
+`GET /api/order/{orderId}` returns one order with items, statuses, and totals.
+Customers can view only their own orders (`403` for another customer's order).
+Admins can view any order without a customer profile. Unknown orders return `404`.
+All order endpoints require a bearer token.
+
+Order lists accept zero-based `page` (default `0`) and `size` (default `20`, range
+`1`–`100`). Negative pages and invalid sizes return `400`. Results are ordered by
+creation time descending, then order ID descending to break ties:
+
+- `GET /api/order/my?page=0&size=20`: the authenticated customer's orders.
+- `GET /api/order?page=0&size=20`: all orders, admin only.
+- `GET /api/order/consumer/{consumerId}?page=0&size=20`: one customer's orders,
+  admin only (`404` for an unknown customer).
+
+**API response change:** these list endpoints now return a page object with
+`content`, `number`, `size`, `totalElements`, and `totalPages` instead of a plain
+array. Pages beyond the available results have empty `content`.
+
+### Cancelling an order item
+
+Authenticated customers can cancel their own order items with
+`PATCH /api/order/{orderId}/items/{itemId}/cancel` (no request body).
+Returns the updated item with `200 OK`. Only `PLACED` items can be cancelled;
+shipped, delivered, or already cancelled items return `400 Bad Request`.
+Cancelling another customer's item returns `403 Forbidden`; an unknown item or
+mismatched order returns `404 Not Found`. Cancellation restores the item's stock
+once, including when requests compete with another cancellation or admin shipping.
+The order total remains the original purchase total.
+
+Order responses also include `originalTotal`, `cancelledTotal`, and `activeTotal`.
+These are calculated from saved order-item unit prices and quantities, so later
+catalog price changes do not affect them. `originalTotal` includes every item,
+`cancelledTotal` includes only `CANCELLED` items, and `activeTotal` is their difference
+(including placed, shipped, and delivered items). The existing `totalPrice` field
+continues to hold the original checkout total. For example, a 100.00 order with
+30.00 cancelled returns 100.00 original, 30.00 cancelled, and 70.00 active.
+
+Database regression tests in `CheckoutDatabaseTests` require a disposable PostgreSQL
+database configured through `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`, plus the
+application's admin and JWT environment variables. Run them with `./mvnw test`.
+
 ### Shopping Cart
 - Add products to the cart.
 - Update product quantities.
@@ -270,7 +366,38 @@ This stops and removes containers while preserving named volumes.
 docker compose down -v
 ```
 
-## Project Status
+## Continuous integration
+
+The `CI` workflow in `.github/workflows/ci.yml` runs on every push, pull request,
+and manual dispatch. It starts a fresh PostgreSQL 17 service, waits for database
+health, installs Java 21, and runs `bash ./mvnw -B -ntp verify`. Spring Boot runs
+Flyway migrations against this empty database and validates the resulting schema.
+The Maven wrapper uses the repository's configured Maven version.
+
+CI uses disposable test credentials and a test-only JWT key. No repository secrets
+or GitHub environment approval are required. These values must not be used for a
+deployed application. The workflow has read-only repository permissions.
+
+After testing, `.github/scripts/check_test_reports.py` writes a per-suite summary
+and fails the job if either database test suite is missing or skipped, or any test
+reports a failure or error. This prevents a green build caused by missing `DB_URL`.
+The report check and artifact upload run even after a build failure.
+
+In GitHub, open **Actions → CI → a workflow run** to view the summary and download
+the `test-reports` artifact (Surefire reports and application logs, kept for 14 days).
+Maven failures fail the workflow; the upload does not hide them. The workflow becomes
+active when these files are pushed to GitHub. Requiring CI before merge is a separate
+repository branch-protection setting.
+
+To reproduce it locally, point `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD` at a
+disposable PostgreSQL database and supply the application admin/JWT variables.
+Run `./mvnw -B -ntp verify` (Windows: `.\mvnw.cmd -B -ntp verify`), then
+`python .github/scripts/check_test_reports.py`.
+
+References: [GitHub PostgreSQL services](https://docs.github.com/en/actions/tutorials/use-containerized-services/create-postgresql-service-containers)
+and [artifact uploads](https://github.com/actions/upload-artifact).
+
+## Development focus
 
 The project is under active development.
 
