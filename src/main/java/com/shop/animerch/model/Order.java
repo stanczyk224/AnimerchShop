@@ -32,6 +32,10 @@ public class Order {
     }
     @Column(name = "total_price", nullable = false)
     private BigDecimal totalPrice;
+    @Column(name = "checkout_key", length = 128, updatable = false)
+    private String checkoutKey;
+    @Embedded
+    private DeliveryAddress deliveryAddress;
     @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
     private List<OrderItem> orderItems = new ArrayList<>();
 
@@ -48,6 +52,21 @@ public class Order {
 
     public void recalculateTotalPrice() {
         this.totalPrice = calculateTotalPrice();
+    }
+
+    public BigDecimal getOriginalTotal() {
+        return calculateTotalPrice();
+    }
+
+    public BigDecimal getCancelledTotal() {
+        return orderItems.stream()
+                .filter(item -> item.getStatus() == OrderStatus.CANCELLED)
+                .map(OrderItem::calculateSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+    }
+
+    public BigDecimal getActiveTotal() {
+        return getOriginalTotal().subtract(getCancelledTotal());
     }
 
 }

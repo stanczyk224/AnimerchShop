@@ -1,18 +1,12 @@
 package com.shop.animerch.repository;
 
 import com.shop.animerch.model.Order;
-import com.shop.animerch.model.OrderItem;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-import java.util.List;
 import java.util.Optional;
 
-@Repository
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    List<Order> findAllByConsumerIdOrderByCreatedAtDesc(Long consumerId);
-
-    Optional<Order> findByIdAndConsumerId(Long orderId, Long consumerId);
-    List<Order> findAllByOrderByCreatedAtDesc();
-
+    Page<Order> findAllByConsumerId(Long consumerId, Pageable pageable);
+    Optional<Order> findByConsumerIdAndCheckoutKey(Long consumerId, String checkoutKey);
 }
