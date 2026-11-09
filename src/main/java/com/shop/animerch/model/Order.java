@@ -37,6 +37,7 @@ public class Order {
     @Embedded
     private DeliveryAddress deliveryAddress;
     @OneToMany(mappedBy = "order", cascade = CascadeType.PERSIST)
+    @OrderBy("id ASC")
     private List<OrderItem> orderItems = new ArrayList<>();
 
     public void addItem(OrderItem item) {
