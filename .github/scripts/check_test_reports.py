@@ -10,6 +10,7 @@ def main():
     report_dir = Path(sys.argv[1]) if len(sys.argv) > 1 else Path("target/surefire-reports")
     required = {
         "com.shop.animerch.CheckoutDatabaseTests",
+        "com.shop.animerch.WishlistDatabaseTests",
         "com.shop.animerch.AnimerchApplicationTests",
     }
     seen = set()

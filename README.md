@@ -78,6 +78,25 @@ adds the timestamp to existing reviews.
 - Consumer CRUD operations.
 - Automatic shopping cart creation.
 
+### Wishlist
+
+Customers can bookmark products without purchasing or reserving stock. Out-of-stock
+products can be saved. All endpoints require a bearer token and a customer profile;
+identity comes from the token, and each customer can access only their own wishlist.
+
+- `POST /api/wishlist/items/{productId}`: save a product (`200 OK` with the bookmark).
+  Saving again returns the existing bookmark, including concurrent duplicate saves.
+  An unknown product returns `404`.
+- `GET /api/wishlist?page=0&size=20`: return a page of bookmarks with product ID,
+  name, current price, and save timestamp. Newest first, with ID descending for ties.
+  Page must be non-negative; size must be between 1 and 100 (`400` otherwise).
+- `DELETE /api/wishlist/items/{productId}`: remove your bookmark (`204 No Content`).
+  Removing a missing bookmark also returns `204` and never modifies another customer's list.
+
+Migration V21 enforces a unique customer/product pair. Deleting a product or customer
+removes their associated bookmarks. `WishlistDatabaseTests` covers authenticated HTTP
+requests, customer isolation, pagination, stock independence, constraints, and concurrent saves.
+
 ### Retrying checkout
 
 `POST /api/order/checkout` requires a bearer token and an `Idempotency-Key` header.
@@ -379,7 +398,7 @@ or GitHub environment approval are required. These values must not be used for a
 deployed application. The workflow has read-only repository permissions.
 
 After testing, `.github/scripts/check_test_reports.py` writes a per-suite summary
-and fails the job if either database test suite is missing or skipped, or any test
+and fails the job if a required database test suite is missing or skipped, or any test
 reports a failure or error. This prevents a green build caused by missing `DB_URL`.
 The report check and artifact upload run even after a build failure.
 
