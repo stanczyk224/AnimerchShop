@@ -17,6 +17,8 @@ public record ProductDTO(
         int quantity,
         BigDecimal price,
         SellerSummaryDTO seller,
+        Double averageRating,
+        long reviewCount,
         List<CategoryDTO> categories,
         List<ProductPhotoDTO> photos
 ) {}

@@ -3,9 +3,8 @@ package com.shop.animerch.mapper;
 import com.shop.animerch.model.Product;
 import com.shop.animerch.record.ProductDTO;
 import com.shop.animerch.record.ProductUpdateDTO;
+import com.shop.animerch.record.ProductRatingSummary;
 import org.mapstruct.*;
-
-import java.util.List;
 
 @Mapper(
         componentModel = "spring",
@@ -17,10 +16,10 @@ import java.util.List;
 )
 public interface ProductMapper {
 
-    @Mapping(target = "seller", qualifiedByName = "toSummaryDTO")
-    ProductDTO toDTO(Product product);
-
-    List<ProductDTO> toDTOList(List<Product> products);
+    @Mapping(target = "seller", source = "product.seller", qualifiedByName = "toSummaryDTO")
+    @Mapping(target = "averageRating", source = "summary.averageRating")
+    @Mapping(target = "reviewCount", source = "summary.reviewCount")
+    ProductDTO toDTO(Product product, ProductRatingSummary summary);
     @BeanMapping(
             nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
     )

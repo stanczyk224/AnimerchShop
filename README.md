@@ -40,6 +40,11 @@ The project follows a layered architecture and uses Docker Compose for simplifie
 - Seller photo uploads.
 
 ### Product Reviews
+Product responses include `averageRating` (a number, or `null` without reviews) and
+`reviewCount` (zero without reviews). These reflect current reviews, including rating
+edits and deletions. Product lists and search pages load summaries with one grouped
+query for all returned products. No stored counters or database migration are needed.
+
 - Customers can review products with at least one delivered order item in their own order history.
 - One review per customer per product, with a rating from 1 to 5 and required text (up to 5000 characters).
 - Authenticated users can read paginated product reviews.

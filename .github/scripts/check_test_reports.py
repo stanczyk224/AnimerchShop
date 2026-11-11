@@ -11,6 +11,7 @@ def main():
     required = {
         "com.shop.animerch.CheckoutDatabaseTests",
         "com.shop.animerch.WishlistDatabaseTests",
+        "com.shop.animerch.ProductRatingDatabaseTests",
         "com.shop.animerch.AnimerchApplicationTests",
     }
     seen = set()

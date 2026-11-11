@@ -70,7 +70,7 @@ public class SecurityConfig {
         );
 
         configuration.setAllowedHeaders(
-                List.of("Authorization", "Content-Type")
+                List.of("Authorization", "Content-Type", "idempotency-Key")
         );
 
         UrlBasedCorsConfigurationSource source =

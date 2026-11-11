@@ -13,6 +13,7 @@ import com.shop.animerch.repository.CategoryRepository;
 import com.shop.animerch.repository.ProductPhotoRepository;
 import com.shop.animerch.repository.ProductRepository;
 import com.shop.animerch.repository.SellerRepository;
+import com.shop.animerch.repository.ReviewRepository;
 import com.shop.animerch.service.storage.StorageService;
 import com.shop.animerch.service.storage.StorageType;
 import com.shop.animerch.utils.ProductCsvReader;
@@ -49,6 +50,7 @@ public class ProductService {
     private final ProductCsvReader productCsvReader;
     private final ProductMapper productMapper;
     private final CategoryRepository categoryRepository;
+    private final ReviewRepository reviewRepository;
 
     private static final int MAX_PAGE_SIZE = 20;
 
@@ -280,9 +282,7 @@ public class ProductService {
 
         loadCategories(products);
 
-        return products.stream()
-                .map(productMapper::toDTO)
-                .toList();
+        return toProductDTOs(products);
     }
 
     // Paginated products
@@ -306,7 +306,7 @@ public class ProductService {
 
         Product product = findProductById(id);
 
-        return productMapper.toDTO(product);
+        return toProductDTOs(List.of(product)).getFirst();
     }
 
     // =========================
@@ -380,11 +380,12 @@ public class ProductService {
                         product -> product
                 ));
 
-        List<ProductDTO> content = ids.stream()
+        List<Product> orderedProducts = ids.stream()
                 .map(productsById::get)
                 .filter(Objects::nonNull)
-                .map(productMapper::toDTO)
                 .toList();
+
+        List<ProductDTO> content = toProductDTOs(orderedProducts);
 
         return new PageImpl<>(
                 content,
@@ -442,7 +443,8 @@ public class ProductService {
                 savedProduct.getId()
         );
 
-        return productMapper.toDTO(savedProduct);
+        return productMapper.toDTO(savedProduct,
+                new ProductRatingSummary(savedProduct.getId(), null, 0));
     }
 
     // =========================
@@ -541,6 +543,20 @@ public class ProductService {
             product.setCategories(categories);
         }
 
-        return productMapper.toDTO(product);
+        return toProductDTOs(List.of(product)).getFirst();
+    }
+
+    private List<ProductDTO> toProductDTOs(List<Product> products) {
+        if (products.isEmpty()) {
+            return List.of();
+        }
+        // One aggregate query for the entire list, rather than one per product.
+        List<Long> ids = products.stream().map(Product::getId).toList();
+        Map<Long, ProductRatingSummary> summaries = reviewRepository.summarizeByProductIds(ids)
+                .stream().collect(Collectors.toMap(ProductRatingSummary::productId, summary -> summary));
+        return products.stream()
+                .map(product -> productMapper.toDTO(product, summaries.getOrDefault(product.getId(),
+                        new ProductRatingSummary(product.getId(), null, 0))))
+                .toList();
     }
 }
