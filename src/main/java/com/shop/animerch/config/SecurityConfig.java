@@ -42,6 +42,16 @@ public class SecurityConfig {
                                 "/swagger-ui.html",
                                 "/v3/api-docs/**"
                         ).permitAll()
+                        .requestMatchers(org.springframework.http.HttpMethod.GET,
+                                "/api/products",
+                                "/api/products/{productId}",
+                                "/api/products/{productId}/photos",
+                                "/api/products/{productId}/photos/{photoId}/content",
+                                "/api/categories",
+                                "/api/categories/{categoryId}",
+                                "/api/sellers",
+                                "/api/sellers/{sellerId}"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session ->

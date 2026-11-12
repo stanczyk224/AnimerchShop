@@ -31,6 +31,7 @@ public class ProductController {
             @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false) BigDecimal minPrice,
             @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) Long sellerId,
             @ParameterObject Pageable pageable
     ) {
         return productService.searchProducts(
@@ -38,6 +39,7 @@ public class ProductController {
                 categoryId,
                 minPrice,
                 maxPrice,
+                sellerId,
                 pageable
         );
     }

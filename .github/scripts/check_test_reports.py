@@ -12,6 +12,7 @@ def main():
         "com.shop.animerch.CheckoutDatabaseTests",
         "com.shop.animerch.WishlistDatabaseTests",
         "com.shop.animerch.ProductRatingDatabaseTests",
+        "com.shop.animerch.ProductFilterDatabaseTests",
         "com.shop.animerch.AnimerchApplicationTests",
     }
     seen = set()

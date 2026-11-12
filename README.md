@@ -1,15 +1,22 @@
 # AnimerchShop
 
-A RESTful backend application for an anime merchandise store, built with Java and Spring Boot.
+A fullstack anime merchandise store with a Java/Spring Boot REST API and a React/TypeScript storefront inspired by Berserk.
 
-AnimerchShop provides product and seller management, shopping cart functionality, JWT authentication, image uploads, and PostgreSQL integration.
+AnimerchShop provides product and seller browsing, a guest basket, customer registration and login, delivery checkout, order history, image uploads, and PostgreSQL integration.
 
-The project follows a layered architecture and uses Docker Compose for simplified deployment and development.
+The backend follows a layered architecture. Docker Compose runs the API and database; Vite runs the frontend separately during development.
+
+This is a learning and portfolio project. The frontend was built with AI assistance
+(honestly: vibecoded) while learning React and TypeScript.
 
 ## Tech Stack
 
 | Technology | Purpose |
 |---|---|
+| React 19 | Storefront components and state |
+| TypeScript | Frontend types |
+| Vite | Frontend development server and production build |
+| CSS and SVG | Responsive dark fantasy design and animations |
 | Java 21 | Programming language |
 | Spring Boot 4 | Backend framework |
 | Spring Data JPA | Database access |
@@ -26,7 +33,41 @@ The project follows a layered architecture and uses Docker Compose for simplifie
 
 ## Features
 
+### Storefront
+
+- Public product feed with uploaded images, prices, stock and rating summaries.
+- Combined search, seller/category filters, price ranges, sorting and pagination.
+- Seller names link to their products; page sizes are 6, 12 or 20.
+- Guest basket with visible per-product quantities and calculated totals.
+- Registration and login, with frontend and backend input validation.
+- Customer checkout with delivery details, basket review and order confirmation.
+- Retry-safe checkout, including recovery after a lost response or page reload.
+- My orders: paginated purchases, item statuses, saved delivery details and totals.
+- Responsive layouts, lightweight animations and reduced-motion support.
+
+The browsing basket lives in memory and resets on reload. Signing in preserves it.
+Checkout asks for confirmation before replacing any previously saved server cart
+with the reviewed basket. Pending checkout details and the purchase key are kept
+in tab session storage until the result is known. Login tokens stay in memory,
+so reloading requires signing in again.
+
+Checkout records an order; **no online payment is collected**. A customer profile
+is required, so an administrator account without one cannot place orders. Wishlist,
+review editing and catalog administration have backend APIs but no dedicated UI yet.
+See [frontend setup and behavior](Frontend/STORE-SETUP.md) for details.
+
 ### Product Management
+Catalog listing, individual product details, product photos and category GET
+endpoints, along with seller list/detail GET endpoints, are available publicly.
+Product search supports combining `search`, `sellerId`, `categoryId`, `minPrice`
+and `maxPrice` with pageable sorting. Prices must be non-negative, with minimum
+not exceeding maximum. The storefront exposes these controls and customer order
+history through My orders.
+
+Catalog changes, account data, server cart APIs and checkout remain protected. The React storefront supports guest
+browsing and a local basket, with authenticated checkout, delivery validation and
+retry-safe order submission. The UI does not collect online payments.
+
 - Product CRUD operations.
 - Product descriptions, prices, and stock management.
 - Product categories.
@@ -121,8 +162,15 @@ It also requires a JSON body containing the delivery snapshot:
 }
 ```
 
-Every field except `addressLine2` is required and must not be blank. Maximum lengths
-are 255 for recipient name and each address line, 30 for phone, 100 for city and
+Every field except `addressLine2` is required and must not be blank.
+Phone numbers must contain 7–15 digits and can use an optional leading `+`, spaces,
+parentheses and hyphens. Names, city and country accept international letters and
+normal name punctuation; addresses cannot contain control characters. Postal codes
+accept letters, numbers, spaces and hyphens. These rules are enforced by the backend
+and the storefront. They validate formatting rather than actual ownership or delivery
+service availability.
+
+Maximum lengths are 255 for recipient name and each address line, 30 for phone, 100 for city and
 country, and 20 for postal code. Invalid bodies return `400`. The address is saved
 on the order and returned as `deliveryAddress` in checkout, order details, and order
 history. Later customer profile changes do not change this snapshot. Migration V20
@@ -225,6 +273,19 @@ application's admin and JWT environment variables. Run them with `./mvnw test`.
 The application follows a layered architecture:
 
 ```text
+AnimerchShop/
+├── Frontend/            # React + TypeScript storefront
+│   ├── src/             # Catalog, checkout, account forms and order history
+│   └── tests/           # Frontend validation and cart regression tests
+├── src/main/java/       # Spring Boot application
+├── src/main/resources/  # Configuration and Flyway migrations
+├── src/test/java/       # Unit, HTTP/security and PostgreSQL regression tests
+└── compose.yaml         # API and PostgreSQL services
+```
+
+Backend packages:
+
+```text
 src/main/java/com/shop/animerch/
 │
 ├── controller/     # REST API endpoints
@@ -245,6 +306,7 @@ src/main/java/com/shop/animerch/
 - Git
 - Docker Desktop or Docker Engine
 - Docker Compose
+- Node.js 24 and npm to run the frontend (the version used for frontend checks)
 
 Java, Maven, and PostgreSQL do not need to be installed locally when using Docker Compose.
 
@@ -305,6 +367,37 @@ The backend will be available at:
 ```text
 http://localhost:8080
 ```
+
+### 5. Start the frontend
+
+In a second terminal, from the repository root:
+
+```bash
+cd Frontend
+npm ci
+npm run dev
+```
+
+Open the URL Vite prints, normally [http://localhost:5173](http://localhost:5173).
+Keep both Docker and the frontend development server running. Use Sign up to create
+a customer account; you can browse products and build a basket before signing in.
+
+Vite forwards `/api` requests to the backend at `http://localhost:8080`. The frontend
+is not included in Docker Compose. `ANIMERCH_API_TARGET` can override the proxy target
+for isolated development/testing. Never put admin passwords or JWT signing secrets
+in frontend files.
+
+To build and check the frontend from its folder:
+
+```bash
+npm test
+npm run build
+```
+
+The production output is `Frontend/dist/`. A deployment needs a static host and a
+server-side `/api` proxy; Vite's development proxy is not included in those files.
+Browser checkout QA is documented in [STORE-SETUP.md](Frontend/STORE-SETUP.md) and
+must use a disposable database because it creates test customers and orders.
 
 ## API Documentation — Swagger
 
@@ -392,6 +485,9 @@ docker compose down -v
 
 ## Continuous integration
 
+The existing GitHub Actions workflow verifies the backend. Frontend tests and builds
+are currently run separately using the commands above.
+
 The `CI` workflow in `.github/workflows/ci.yml` runs on every push, pull request,
 and manual dispatch. It starts a fresh PostgreSQL 17 service, waits for database
 health, installs Java 21, and runs `bash ./mvnw -B -ntp verify`. Spring Boot runs
@@ -426,10 +522,9 @@ and [artifact uploads](https://github.com/actions/upload-artifact).
 The project is under active development.
 
 Current focus:
-- Backend functionality and business logic.
-- Authentication and authorization.
-- Docker-based deployment.
-- CI/CD pipeline implementation.
+- Connecting the remaining backend features to the storefront.
+- Frontend administration, wishlist and review workflows.
+- Frontend CI and deployment alongside the Docker backend.
 
 ## Author
 
@@ -439,4 +534,4 @@ GitHub: [github.com/stanczyk224](https://github.com/stanczyk224)
 
 ---
 
-*Built as a Java Backend portfolio project.*
+*Built as a fullstack learning and portfolio project.*

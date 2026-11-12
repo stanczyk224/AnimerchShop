@@ -11,5 +11,7 @@ public record LoginRequest(
         String email,
 
         @NotBlank(message = "Password is required")
+        @com.shop.animerch.validation.Utf8Length
+        @Size(max = 72, message = "Password must not exceed 72 characters")
         String password
 ) {}

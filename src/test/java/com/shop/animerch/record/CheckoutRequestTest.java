@@ -21,8 +21,9 @@ class CheckoutRequestTest {
             assertFalse(validator.validate(new CheckoutRequest(null)).isEmpty());
             for (int i = 0; i < valid.length; i++) {
                 String[] fields = valid.clone();
+                fields[i] = i == 1 ? "+998 90 123 45 67" : "x".repeat(limits[i]);
+                assertTrue(validator.validate(request(fields)).isEmpty(), "Valid field " + i);
                 fields[i] = "x".repeat(limits[i]);
-                assertTrue(validator.validate(request(fields)).isEmpty(), "Boundary field " + i);
                 fields[i] += "x";
                 assertFalse(validator.validate(request(fields)).isEmpty(), "Length field " + i);
                 if (i != 3) {

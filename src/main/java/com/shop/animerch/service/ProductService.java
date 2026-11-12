@@ -320,6 +320,23 @@ public class ProductService {
             BigDecimal maxPrice,
             Pageable pageable
     ) {
+        return searchProducts(search, categoryId, minPrice, maxPrice, null, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<ProductDTO> searchProducts(
+            String search, Long categoryId, BigDecimal minPrice, BigDecimal maxPrice,
+            Long sellerId, Pageable pageable
+    ) {
+
+        if ((minPrice != null && minPrice.signum() < 0)
+                || (maxPrice != null && maxPrice.signum() < 0)
+                || (minPrice != null && maxPrice != null && minPrice.compareTo(maxPrice) > 0)) {
+            throw new BadRequestException("Prices must be non-negative and minimum price must not exceed maximum price");
+        }
+        if ((sellerId != null && sellerId < 1) || (categoryId != null && categoryId < 1)) {
+            throw new BadRequestException("Seller and category IDs must be positive");
+        }
 
         if (pageable.getPageSize() > MAX_PAGE_SIZE) {
             throw new BadRequestException(
@@ -330,6 +347,7 @@ public class ProductService {
         Specification<Product> spec = Specification
                 .where(ProductSpecification.hasName(search))
                 .and(ProductSpecification.hasCategoryId(categoryId))
+                .and(ProductSpecification.hasSellerId(sellerId))
                 .and(ProductSpecification.hasMinPrice(minPrice))
                 .and(ProductSpecification.hasMaxPrice(maxPrice));
 

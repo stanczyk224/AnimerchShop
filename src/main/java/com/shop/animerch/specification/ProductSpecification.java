@@ -7,6 +7,12 @@ import java.math.BigDecimal;
 
 public class ProductSpecification {
 
+    public static Specification<Product> hasSellerId(Long sellerId) {
+        return (root, query, builder) -> sellerId == null
+                ? builder.conjunction()
+                : builder.equal(root.get("seller").get("id"), sellerId);
+    }
+
     public static Specification<Product> hasName(String search) {
         return (root, query, criteriaBuilder) -> {
             if (search == null || search.isBlank()) {
