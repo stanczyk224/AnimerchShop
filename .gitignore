@@ -45,3 +45,7 @@ build/
 .vscode/
 # Codex local files
 /codex/
+
+# Machine-specific Docker certificate trust (never part of the application image)
+/.local-certs/
+/compose.override.yaml

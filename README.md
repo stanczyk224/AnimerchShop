@@ -4,7 +4,8 @@ A fullstack anime merchandise store with a Java/Spring Boot REST API and a React
 
 AnimerchShop provides product and seller browsing, a guest basket, customer registration and login, delivery checkout, order history, image uploads, and PostgreSQL integration.
 
-The backend follows a layered architecture. Docker Compose runs the API and database; Vite runs the frontend separately during development.
+The backend follows a layered architecture. Docker Compose starts the storefront,
+API and database together. An optional Vite server supports frontend development.
 
 This is a learning and portfolio project. The frontend was built with AI assistance
 (honestly: vibecoded) while learning React and TypeScript.
@@ -306,9 +307,9 @@ src/main/java/com/shop/animerch/
 - Git
 - Docker Desktop or Docker Engine
 - Docker Compose
-- Node.js 24 and npm to run the frontend (the version used for frontend checks)
 
-Java, Maven, and PostgreSQL do not need to be installed locally when using Docker Compose.
+Java, Maven, Node.js, npm and PostgreSQL do not need to be installed locally when
+using Docker Compose. Node.js 24 is needed only for the optional local frontend workflow.
 
 ### 1. Clone the repository
 
@@ -338,7 +339,7 @@ Open `.env` and configure your own credentials and secrets.
 ### 3. Start the application
 
 ```bash
-docker compose up --build -d
+docker compose up
 ```
 
 Docker Compose will:
@@ -349,6 +350,14 @@ Docker Compose will:
 4. Wait for PostgreSQL to become healthy.
 5. Start the Spring Boot application.
 6. Execute Flyway migrations.
+7. Build and test the React frontend, then serve it through Nginx once the API is healthy.
+
+Open the storefront at [http://localhost:3000](http://localhost:3000).
+Use Sign up to create a customer account; browsing and the basket work without one.
+Set `FRONTEND_PORT` in `.env` to use a different storefront port.
+
+The first startup builds the images automatically. After changing source files,
+run `docker compose up --build` to rebuild. Add `-d` to run in the background.
 
 ### 4. Verify the containers
 
@@ -368,9 +377,10 @@ The backend will be available at:
 http://localhost:8080
 ```
 
-### 5. Start the frontend
+### Optional: frontend development with hot reload
 
-In a second terminal, from the repository root:
+Docker already serves the compiled storefront at port 3000. To develop with hot
+reload instead, install Node.js 24 and run these from the repository root:
 
 ```bash
 cd Frontend
@@ -379,11 +389,10 @@ npm run dev
 ```
 
 Open the URL Vite prints, normally [http://localhost:5173](http://localhost:5173).
-Keep both Docker and the frontend development server running. Use Sign up to create
-a customer account; you can browse products and build a basket before signing in.
+Keep the Docker backend running while using this development server.
 
-Vite forwards `/api` requests to the backend at `http://localhost:8080`. The frontend
-is not included in Docker Compose. `ANIMERCH_API_TARGET` can override the proxy target
+Vite forwards `/api` requests to the backend at `http://localhost:8080`.
+`ANIMERCH_API_TARGET` can override the proxy target
 for isolated development/testing. Never put admin passwords or JWT signing secrets
 in frontend files.
 
@@ -394,8 +403,9 @@ npm test
 npm run build
 ```
 
-The production output is `Frontend/dist/`. A deployment needs a static host and a
-server-side `/api` proxy; Vite's development proxy is not included in those files.
+The production output is `Frontend/dist/`. The frontend Docker image serves this
+output with Nginx and forwards `/api` to `app:8080`. When hosting the static files
+elsewhere, configure an equivalent API proxy; Vite's proxy is not included in the build.
 Browser checkout QA is documented in [STORE-SETUP.md](Frontend/STORE-SETUP.md) and
 must use a disposable database because it creates test customers and orders.
 
@@ -446,17 +456,29 @@ If you restart Swagger UI or open a new browser session, you may need to authori
 
 ## Docker Configuration
 
-The project uses a multi-stage Docker build:
+The backend uses a multi-stage Docker build:
 
 - **Build stage:** Maven compiles and packages the Spring Boot application.
 - **Runtime stage:** The application runs using a Java 21 JRE image.
 
-Docker Compose manages two services:
+The frontend uses a Node.js 24 build stage (`npm ci`, tests, TypeScript and Vite build)
+and an Nginx runtime stage containing only the built assets and proxy configuration.
+It serves React fallback routes and waits for the backend health check at startup.
+
+Docker Compose manages three services:
 
 | Service | Description |
 |---|---|
 | app | Spring Boot REST API |
 | db | PostgreSQL database |
+| frontend | Nginx storefront at `localhost:3000`, with an internal API proxy |
+
+On networks with HTTPS inspection, npm inside Docker may need the network's
+already-trusted CA. [compose.ca.example.yaml](compose.ca.example.yaml) shows an
+optional build-secret override: export the public CA as `.local-certs/npm-ca.pem`
+and copy the example to `compose.override.yaml`. Both local files are ignored by
+Git. The CA is mounted only during dependency installation and is not copied into
+the runtime image. TLS verification remains enabled.
 
 ### Persistent Storage
 

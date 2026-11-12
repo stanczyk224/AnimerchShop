@@ -1,0 +1,12 @@
+# Optional: copy to compose.override.yaml only on networks with HTTPS inspection.
+# Export your already-trusted inspection CA (public certificate only) as PEM to
+# .local-certs/npm-ca.pem. The certificate is mounted only during npm installation.
+services:
+  frontend:
+    build:
+      secrets:
+        - npm_ca
+
+secrets:
+  npm_ca:
+    file: ./.local-certs/npm-ca.pem

@@ -16,6 +16,8 @@ Frontend/dist/
 # Environment and secrets
 .env
 .env.*
+.local-certs/
+compose.override.yaml
 
 # User uploaded files
 uploads/

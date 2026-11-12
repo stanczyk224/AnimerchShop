@@ -1,2 +1,5 @@
   [mcp_servers.openide]
     url = "http://127.0.0.1:64342/stream"
+
+[mcp_servers.openide.tools.reformat_file]
+approval_mode = "approve"

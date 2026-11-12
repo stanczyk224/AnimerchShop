@@ -1,8 +1,13 @@
 # Animerch storefront
 
-Run the existing backend with Docker Compose from the repository root. Then, in
-this folder, run `npm install` (first time only) and `npm run dev`. Open the local
-URL printed by Vite. Products load immediately, with no account needed.
+From the repository root, run `docker compose up` and open http://localhost:3000.
+This starts the compiled storefront, backend and PostgreSQL together. No local Node
+installation is needed. `FRONTEND_PORT` changes the storefront port; source edits
+require `docker compose up --build` to rebuild the images.
+
+For hot reload, optionally run `npm ci` and `npm run dev` in this folder using Node.js
+24 while the Docker backend runs. Open Vite's local URL (normally localhost:5173).
+Products load immediately, with no account needed.
 
 Catalog listing, product details, product images and category reads are public.
 Account data, cart APIs, checkout and catalog writes still require authentication.
@@ -10,6 +15,9 @@ The frontend uses the returned access token in memory; reloading requires signin
 No admin credentials or JWT signing secrets belong in frontend environment files.
 
 Vite forwards `/api` requests to `http://localhost:8080` in development and preview.
+In Docker, Nginx proxies `/api` to `app:8080` over the Compose network, so browser
+requests remain same-origin. It also serves frontend fallback routes and provides
+the container health check. The backend remains available on port 8080 for Swagger.
 Search, sorting, pagination, pricing, stock, rating summaries and product images
 come from the real API. Products without images show a decorative placeholder.
 If the backend is unavailable, the collection shows an error with a retry action.
@@ -56,9 +64,9 @@ Seller and category options load publicly; all seller pages are loaded using the
 backend's 20-item limit. Seller writes remain admin-only.
 
 `npm run build` checks TypeScript and builds to `dist/`. `npm run preview` serves
-that build locally with the same backend proxy. For deployment, serve `dist/`
-and configure the hosting server to forward `/api` to the backend; Vite's proxy
-is not part of the built static files.
+that build locally with the same backend proxy. Docker builds the assets and serves
+them through Nginx, with `/api` forwarded to the backend service. For other hosting,
+serve `dist/` and supply an equivalent proxy; Vite's proxy is not part of the static files.
 
 `npm test` (Node 24) runs validation and cart-preparation regression tests.
 
