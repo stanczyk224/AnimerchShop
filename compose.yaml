@@ -38,7 +38,10 @@ services:
       timeout: 5s
       retries: 12
       start_period: 60s
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 volumes:
   postgres_data:
   uploads_data:

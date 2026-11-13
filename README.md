@@ -418,6 +418,9 @@ and [artifact uploads](https://github.com/actions/upload-artifact).
 
 ## Development focus
 
+See the [independent development roadmap](docs/fullstack-roadmap.md) for remaining
+customer/admin features, learning exercises, acceptance criteria and deployment work.
+
 The project is under active development.
 
 Current focus:
