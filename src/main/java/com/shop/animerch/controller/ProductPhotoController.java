@@ -27,7 +27,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/products/{productId}/photos")
-@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 @Validated
 @Tag(name = "Product Photos", description = "Product photo management")
@@ -57,6 +56,7 @@ public class ProductPhotoController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "Bearer Authentication")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload a photo for a product")
     public ResponseEntity<ProductPhotoDTO> uploadPhoto(
@@ -72,6 +72,7 @@ public class ProductPhotoController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "Bearer Authentication")
     @PostMapping(
             path = "/import",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
@@ -110,6 +111,7 @@ public class ProductPhotoController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "Bearer Authentication")
     @DeleteMapping("/{photoId}")
     @Operation(summary = "Delete a product photo")
     public ResponseEntity<Void> deletePhoto(

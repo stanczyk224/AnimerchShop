@@ -24,24 +24,24 @@
 .nav-links a {
   display: flex;
   align-items: center;
+  font-weight: bold;
   padding: 1rem;      
   color: #faf8f5;
   font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   text-decoration: none; 
+  transition: all ease-in-out 0.3s;
 }
 
 .nav-links a:hover {
-  color: #ff0000;
   background-color: #a10707; 
+  text-shadow: #300000 1px 0 5px;
+  transform: translateY(4px);
 }
 
 .navbar-logo {
-  font-weight: bold;
+  
   font-size: 1.3rem;
   color: white;
   text-decoration: none;
   margin-right: auto; /* Pushes the logo to the left */
-}
-.nav-links a:hover {
-  color: #38bdf8;
 }

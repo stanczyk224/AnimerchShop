@@ -18,8 +18,8 @@ import java.util.List;
 public interface ProductMapper {
 
     @Mapping(target = "seller", qualifiedByName = "toSummaryDTO")
+    @Mapping(source = "product.photos", target = "photos")
     ProductDTO toDTO(Product product);
-
     List<ProductDTO> toDTOList(List<Product> products);
     @BeanMapping(
             nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE

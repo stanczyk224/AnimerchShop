@@ -1,18 +1,28 @@
 import './ProductCard.css';
-import Image from '../public/berser tshirt.jpg'
-function ProductCard() {
+
+interface ProductCardProps {
+  name: string;
+  description: string;
+  price: number;
+  quantity: number;
+  image: string;
+}
+
+function ProductCard({name, description, price, quantity, image}: ProductCardProps) {
   return (
     <div className="product-card">
       <div className="product-card-header">
-        <h2 className="product-name">Name of product</h2>
+        <h2 className="product-name">{name}</h2>
       </div>
       
-      <img src={Image} alt="Product Image" className="product-image" />
+      <img src={image} alt="Product Image" className="product-image" />
       <div className="product-card-main">
-        <p className="product-description">Description of the product. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-        <p className="product-price">Price: $XX.XX</p>
+        <p className="product-description">{description}</p>
+        
+        <p className="product-price">Price: {price}</p>
       </div>
       <div className="product-card-controls">
+        <p className='product-quantity'>Remains: {quantity}</p>
         <button className="quantity-button">-</button>
         <span className="quantity">Quantity: 0</span>
         <button className="quantity-button">+</button>

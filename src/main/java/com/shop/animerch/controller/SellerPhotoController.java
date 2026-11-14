@@ -17,14 +17,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/sellers/{sellerId}/photos")
-@PreAuthorize("hasRole('ADMIN')")
-@SecurityRequirement(name = "Bearer Authentication")
 @RequiredArgsConstructor
 @Tag(name = "Seller Photos", description = "Seller photo management")
 public class SellerPhotoController {
 
     private final SellerPhotoService sellerPhotoService;
-
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "Bearer Authentication")
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Upload a photo for a seller")
     public ResponseEntity<SellerPhotoDTO> uploadPhoto(
@@ -36,7 +35,6 @@ public class SellerPhotoController {
 
         return ResponseEntity.status(HttpStatus.CREATED).body(photo);
     }
-
     @GetMapping
     @Operation(summary = "Get all photos of a seller")
     public ResponseEntity<List<SellerPhotoDTO>> getPhotos(
@@ -68,7 +66,8 @@ public class SellerPhotoController {
                 )
                 .body(resource);
     }
-
+    @PreAuthorize("hasRole('ADMIN')")
+    @SecurityRequirement(name = "Bearer Authentication")
     @DeleteMapping("/{photoId}")
     @Operation(summary = "Delete a seller photo")
     public ResponseEntity<Void> deletePhoto(
