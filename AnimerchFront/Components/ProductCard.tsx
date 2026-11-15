@@ -1,4 +1,4 @@
-import './ProductCard.css';
+import "./ProductCard.css"
 
 interface ProductCardProps {
   name: string;

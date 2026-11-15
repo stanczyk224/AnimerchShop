@@ -1,12 +1,18 @@
 import "./App.css"
 import Navigation from '../Components/Navigation'
-import Feed from '../Components/Feed'
+import Main from '../Components/Main'
+import Welcome from '../Components/Welcome'
+import Banner from '../Components/Banner'
 import Footer from '../Components/Footer'
 function App() {
   return (
     <div className="App">
       <Navigation />
-      <Feed />
+      <Welcome />
+      <div className="banners">
+        <Banner />
+      </div>
+      <Main />
       <Footer />
     </div>
   )

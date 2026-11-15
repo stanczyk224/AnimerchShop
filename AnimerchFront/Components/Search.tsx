@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent, type SubmitEvent } from "react";
-
+import './Search.css'
 interface SearchProps {
   placeholder?: string;
   onSearch?: (query: string) => void;

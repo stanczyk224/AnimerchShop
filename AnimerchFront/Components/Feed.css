@@ -1,3 +1,8 @@
+.feed {
+  display: flex;
+  flex-direction: column;
+}
+
 .product-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -8,4 +13,12 @@
 
 .loading {
     min-height: 100vh;
+}
+.product-cards {
+  transition: opacity 0.15s ease;
+}
+
+.product-cards.fetching {
+  opacity: 0.55;
+  pointer-events: none;
 }
