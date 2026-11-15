@@ -1,17 +1,11 @@
-.feed {
-    flex: 1;
-}
-
 .product-cards {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  min-height: 100vh;
 }
 
-.banners {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-evenly;
-    align-items: center;
-    background-color: #000000;
-    margin: 20px;
+.loading {
+    min-height: 100vh;
 }

@@ -26,7 +26,6 @@
   font-size: 1.2rem;
   font-weight: bold;
   margin-bottom: 0.5rem;
-  border: 1px solid #a10707;
 }
 
 .product-card-main {
@@ -35,7 +34,6 @@
   justify-content: center;
   align-items: center;
   margin-bottom: 1rem;
-  border: 1px solid #a10707;
 }
 
 .product-name {
@@ -53,7 +51,28 @@
 
 .product-card-controls {
   margin-bottom: 1rem;
-  border: 1px solid #ccc;
+  
+}
+.product-card-controls button {
+  margin: 0 10px 0 10px;
+  padding: 0 10px;
+  border: none;
+  border-radius: 5px;
+  color: rgb(0, 0, 0);
+  font-size: large; 
+  background-color: rgb(204, 0, 0);
+}
+
+.product-card-controls button:hover {
+  background-color: rgb(90, 0, 0);
+  color: rgb(255, 0, 0);
+  cursor: pointer;
+}
+
+.product-card-controls button:active {
+  background-color: rgb(100, 0, 0);
+  color: rgb(211, 0, 0);
+  
 }
 
 
