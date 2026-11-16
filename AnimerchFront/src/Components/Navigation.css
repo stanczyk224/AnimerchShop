@@ -43,5 +43,28 @@
   font-size: 1.3rem;
   color: white;
   text-decoration: none;
-  margin-right: auto; /* Pushes the logo to the left */
+  margin-right: auto;
 }
+
+
+.logout-btn {
+    padding: 9px 20px;
+    background: transparent;
+    color: #e32636;
+    border: none;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.logout-btn:hover {
+    background: #b51222;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(227, 38, 54, 0.35);
+}
+
+.logout-btn:active {
+    transform: scale(0.96);
+}
+

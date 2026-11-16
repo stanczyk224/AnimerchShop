@@ -1,6 +1,6 @@
 import { useState, useRef, useLayoutEffect } from 'react';
 import ProductCard from './ProductCard';
-import { useDebounce } from '../Hooks/useDebounce';
+import { useDebounce } from '../hooks/useDebounce';
 import { useQuery, keepPreviousData } from '@tanstack/react-query';
 import './Feed.css';
 import SearchBar from './Search';

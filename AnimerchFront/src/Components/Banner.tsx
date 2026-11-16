@@ -1,4 +1,4 @@
-import Berserk from '../public/Berserk_anime_logo.svg'
+import Berserk from '../assets/Berserk_anime_logo.svg'
 import './Banner.css'
 function Banner() {
     return (
