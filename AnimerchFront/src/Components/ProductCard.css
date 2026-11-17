@@ -75,5 +75,15 @@
   
 }
 
+.product-card-controls button:disabled {
+    background-color: rgb(50, 0, 0);
+}
+
+.product-card-controls button:disabled {
+    background-color: rgb(50, 0, 0);
+    color: rgb(0, 0, 0);
+    cursor: default;
+}
+
 
 
