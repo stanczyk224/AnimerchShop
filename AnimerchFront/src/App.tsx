@@ -12,6 +12,7 @@ import Footer from "./Components/Footer";
 
 import SignIn from "./pages/SignIn";
 import SignUp from "./pages/SignUp";
+import CartPage from "./Components/CartPage";
 
 function App() {
     return (
@@ -23,6 +24,7 @@ function App() {
                     <Routes>
                         <Route path="/signin" element={<SignIn />} />
                         <Route path="/signup" element={<SignUp />} />
+                        <Route path="/cart" element={<CartPage />} />
                     </Routes>
 
                     <Welcome />
